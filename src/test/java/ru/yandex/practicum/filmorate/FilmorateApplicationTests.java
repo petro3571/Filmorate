@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.time.Duration;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -28,7 +27,7 @@ class FilmorateApplicationTests {
 		Film film = new Film();
 		film.setName("test");
 		film.setDescription("test".repeat(100));
-		film.setDuration(Duration.ofMinutes(90));
+		film.setDuration(90);
 		film.setReleaseDate(LocalDate.of(2000,1,1));
 		assertThrows(ValidationException.class, () -> filmController.create(film));
 	}
@@ -73,7 +72,7 @@ class FilmorateApplicationTests {
 		Film film = new Film();
 		film.setId(1L);
 		film.setDescription("Description");
-		film.setDuration(Duration.ofMinutes(1));
+		film.setDuration(1);
 		film.setName("name");
 		film.setReleaseDate(LocalDate.of(2000, 1, 1));
 
