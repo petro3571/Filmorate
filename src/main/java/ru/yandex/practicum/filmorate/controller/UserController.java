@@ -46,7 +46,7 @@ public class UserController {
 
         user.setId(getNextId());
         users.put(user.getId(), user);
-        log.info("Добавлен пользователь: {}" , user);
+        log.info("Добавлен пользователь: {}", user);
         return user;
 
     }
