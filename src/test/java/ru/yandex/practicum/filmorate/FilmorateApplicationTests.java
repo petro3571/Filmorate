@@ -23,7 +23,7 @@ class FilmorateApplicationTests {
 	}
 
 	@Test
-	void ShouldBeFailWithOver200LenghtDescritpion() throws ValidationException {
+	void shouldBeFailWithOver200LengthDescription() throws ValidationException {
 		FilmController filmController = new FilmController();
 		Film film = new Film();
 		film.setName("test");
@@ -34,7 +34,7 @@ class FilmorateApplicationTests {
 	}
 
 	@Test
-	void ShouldBeFailWithNoAInMail() throws ValidationException {
+	void shouldBeFailWithNoAInMail() throws ValidationException {
 		UserController userController = new UserController();
 		User user = new User();
 		user.setName("test");
@@ -45,7 +45,7 @@ class FilmorateApplicationTests {
 	}
 
 	@Test
-	void ShouldBeNameSameLogin() {
+	void shouldBeNameSameLogin() {
 		UserController userController = new UserController();
 		User user = new User();
 		user.setLogin("testLogin");
