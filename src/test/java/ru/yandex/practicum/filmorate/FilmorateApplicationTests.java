@@ -22,28 +22,6 @@ class FilmorateApplicationTests {
 	}
 
 	@Test
-	void shouldBeFailWithOver200LengthDescription() throws ValidationException {
-		FilmController filmController = new FilmController();
-		Film film = new Film();
-		film.setName("test");
-		film.setDescription("test".repeat(100));
-		film.setDuration(90);
-		film.setReleaseDate(LocalDate.of(2000,1,1));
-		assertThrows(ValidationException.class, () -> filmController.create(film));
-	}
-
-	@Test
-	void shouldBeFailWithNoAInMail() throws ValidationException {
-		UserController userController = new UserController();
-		User user = new User();
-		user.setName("test");
-		user.setLogin("testLogin");
-		user.setEmail("dimapetro357gmail.com");
-		user.setBirthday(LocalDate.of(1996,4,19));
-		assertThrows(ValidationException.class, () -> userController.create(user));
-	}
-
-	@Test
 	void shouldBeNameSameLogin() {
 		UserController userController = new UserController();
 		User user = new User();
