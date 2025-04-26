@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PastOrPresent;
 import lombok.Data;
+import org.apache.catalina.startup.CertificateCreateRule;
 
 import java.time.LocalDate;
 
@@ -14,15 +15,15 @@ import java.time.LocalDate;
 public class User {
     private Long id;
 
-    @NotBlank
-    @Email
+    @NotBlank(groups = CreateGroup.class)
+    @Email(groups = CreateGroup.class)
     private String email;
 
-    @NotBlank
+    @NotBlank(groups = {CreateGroup.class, UpdateGroup.class})
     private String login;
 
     private String name;
 
-    @PastOrPresent
+    @PastOrPresent(groups = {CreateGroup.class, UpdateGroup.class})
     private LocalDate birthday;
 }
