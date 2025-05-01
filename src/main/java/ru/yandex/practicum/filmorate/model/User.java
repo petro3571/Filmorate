@@ -15,7 +15,7 @@ public class User {
     private Long id;
 
     @NotBlank(groups = CreateGroup.class)
-    @Email(groups = CreateGroup.class)
+    @Email(groups = {CreateGroup.class, UpdateGroup.class})
     private String email;
 
     @NotBlank(groups = {CreateGroup.class, UpdateGroup.class})
