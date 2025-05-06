@@ -35,7 +35,7 @@ public class InMemoryUserStorage implements UserStorage {
         User user = getUser(userId);
         Set<Long> friends = user.getFriends();
 
-        if(friends == null) {
+        if (friends == null) {
             throw new NotFoundException("Список друзей пуст у пользователя" + userId);
         }
         return friends;
