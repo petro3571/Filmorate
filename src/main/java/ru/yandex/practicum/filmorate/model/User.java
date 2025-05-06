@@ -6,12 +6,15 @@ import jakarta.validation.constraints.PastOrPresent;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * User.
  */
 @Data
 public class User {
+
     private Long id;
 
     @NotBlank(groups = CreateGroup.class)
@@ -25,4 +28,6 @@ public class User {
 
     @PastOrPresent(groups = {CreateGroup.class, UpdateGroup.class})
     private LocalDate birthday;
+
+    private Set<Long> friends = new HashSet<>();
 }

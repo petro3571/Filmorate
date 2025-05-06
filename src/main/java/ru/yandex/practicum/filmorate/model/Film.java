@@ -3,6 +3,8 @@ package ru.yandex.practicum.filmorate.model;
 import lombok.Data;
 import jakarta.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Film.
@@ -21,4 +23,6 @@ public class Film {
 
     @Positive(message = "Продолжительность должна быть положительной.")
     private long duration;
+
+    private Set<Long> like = new HashSet<>();
 }
