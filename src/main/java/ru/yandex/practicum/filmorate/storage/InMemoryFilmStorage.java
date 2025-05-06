@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-public class InMemoryFilmStorage implements FilmStorage{
+public class InMemoryFilmStorage implements FilmStorage {
 
     private final Map<Long, Film> films = new HashMap<>();
     private final InMemoryUserStorage userStorage;
@@ -30,7 +30,7 @@ public class InMemoryFilmStorage implements FilmStorage{
     @Override
     public Film getFilm(Long filmId) {
         if (!films.containsKey(filmId)) {
-            throw new NotFoundException("Фильм с id = "+ filmId + " не найден!");
+            throw new NotFoundException("Фильм с id = " + filmId + " не найден!");
         }
         return films.get(filmId);
     }
