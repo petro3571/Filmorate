@@ -1,7 +1,5 @@
 package ru.yandex.practicum.filmorate.storage;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.DataAlreadyExistException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -10,21 +8,14 @@ import ru.yandex.practicum.filmorate.model.Film;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
 
     private final Map<Long, Film> films = new HashMap<>();
-    private final InMemoryUserStorage userStorage;
-
-    @Autowired
-    public InMemoryFilmStorage(InMemoryUserStorage userStorage) {
-        this.userStorage = userStorage;
-    }
 
     @Override
     public Collection<Film> getAll() {
-        return films.values();
+        return new ArrayList<>(films.values());
     }
 
     @Override
@@ -43,7 +34,6 @@ public class InMemoryFilmStorage implements FilmStorage {
 
         film.setId(getNextId());
         films.put(film.getId(), film);
-        log.info("Добавлен фильм: {}", film);
         return film;
     }
 
@@ -59,17 +49,14 @@ public class InMemoryFilmStorage implements FilmStorage {
 
             return oldFilm;
         }
-            log.warn("Такого фильма нет");
         throw new NotFoundException("Фильм с id = " + film.getId() + " не найден!");
     }
 
     @Override
     public Film deleteFilm(Long filmId) {
         if (films.containsKey(filmId)) {
-            log.info("Удаление фильма");
             return films.remove(filmId);
         }
-        log.warn("Удаление фильма не удалось");
         throw new NotFoundException("Фильм с id = " + filmId + " не найден!");
     }
 
@@ -78,10 +65,6 @@ public class InMemoryFilmStorage implements FilmStorage {
         Film film = getFilm(filmId);
         if (film == null) {
             throw new NotFoundException("Фильм с id = " + filmId + " не найден!");
-        }
-
-        if (!userStorage.existsUserById(userId)) {
-            throw new NotFoundException("Такого пользователя нет");
         }
 
         if (!film.getLike().contains(userId)) {
@@ -94,10 +77,6 @@ public class InMemoryFilmStorage implements FilmStorage {
         Film film = getFilm(filmId);
         if (film == null) {
             throw new NotFoundException("Фильм с id = " + filmId + " не найден!");
-        }
-
-        if (!userStorage.existsUserById(userId)) {
-            throw new NotFoundException("Такого пользователя нет");
         }
 
             film.getLike().remove(userId);

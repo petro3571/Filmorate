@@ -10,7 +10,6 @@ import ru.yandex.practicum.filmorate.model.CreateGroup;
 import ru.yandex.practicum.filmorate.model.UpdateGroup;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.Collection;
 import java.util.List;
@@ -43,9 +42,9 @@ public class UserController {
 
     @PutMapping
     public User update(@Validated(UpdateGroup.class) @Valid @RequestBody User user) {
-        log.info("PUT /users: {}", user);  // ← Что пришло?
+        log.info("PUT /users: {}", user);
         User updatedUser = userService.update(user);
-        log.info("Updated user: {}", updatedUser);  // ← Что вернулось?
+        log.info("Updated user: {}", updatedUser);
         return updatedUser;
     }
 
@@ -76,9 +75,5 @@ public class UserController {
     @GetMapping("/{userId}/friends/common/{otherId}")
     public List<User> getSameFriends(@PathVariable("userId") Long userId, @PathVariable("otherId") Long otherId) {
         return userService.getSameFriends(userId, otherId);
-    }
-
-    public UserStorage getUserStorage() {
-        return userService.getUserStorage();
     }
 }

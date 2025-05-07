@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.storage;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -8,7 +7,6 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Component
 public class InMemoryUserStorage implements UserStorage {
 
@@ -16,7 +14,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public Collection<User> getAll() {
-        return users.values();
+        return new ArrayList<>(users.values());
     }
 
     @Override
@@ -66,34 +64,28 @@ public class InMemoryUserStorage implements UserStorage {
     public User create(User user) {
         user.setId(getNextId());
         users.put(user.getId(), user);
-        log.info("Добавлен пользователь: {}", user);
         return user;
     }
 
     @Override
     public User update(User user) {
         if (!users.containsKey(user.getId())) {
-            log.warn("Обновление пользователя не удалось");
             throw new NotFoundException("Пользователь с id = " + user.getId() + " не найден!");
         }
-        log.info("Начинается обновление.");
         User oldUser = users.get(user.getId());
         if (user.getName() != null) oldUser.setName(user.getName());
         if (user.getEmail() != null) oldUser.setEmail(user.getEmail());
         if (user.getLogin() != null) oldUser.setLogin(user.getLogin());
         if (user.getBirthday() != null) oldUser.setBirthday(user.getBirthday());
         if (user.getFriends() != null) oldUser.setFriends(user.getFriends());
-        log.info("Обноление прошло успешно.");
         return oldUser;
     }
 
     @Override
     public User deleteUser(Long userId) {
         if (users.containsKey(userId)) {
-            log.info("Удаление пользователя");
             return users.remove(userId);
         }
-        log.warn("Удаление пользователя не удалось");
         throw new NotFoundException("Пользователь с id = " + userId + " не найден!");
     }
 
@@ -116,7 +108,6 @@ public class InMemoryUserStorage implements UserStorage {
             secondUser.getFriends().add(userId);
             return firstUser.getFriends();
         }
-        log.warn("Добавление друга не удалось");
         throw new NotFoundException("Пользователь с id = " + userId + " не найден!");
     }
 
@@ -134,7 +125,6 @@ public class InMemoryUserStorage implements UserStorage {
 
             return firstUser;
         }
-        log.warn("Удаление друга не удалось");
         throw new NotFoundException("Пользователь с id = " + userId + " не найден!");
     }
 
@@ -147,8 +137,8 @@ public class InMemoryUserStorage implements UserStorage {
         return ++currentMaxId;
     }
 
+    @Override
     public boolean existsUserById(Long userId) {
         return users.containsKey(userId);
     }
-
 }

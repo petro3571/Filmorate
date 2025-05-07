@@ -24,4 +24,6 @@ public interface UserStorage {
     Set<Long> getUserFriends(Long userId);
 
     List<User> getSameFriends(Long userId, Long otherId);
+
+    boolean existsUserById(Long userId);
 }

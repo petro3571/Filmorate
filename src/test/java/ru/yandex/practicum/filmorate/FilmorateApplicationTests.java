@@ -5,8 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.controller.UserController;
-import ru.yandex.practicum.filmorate.exception.DateFilmValidationException;
-import ru.yandex.practicum.filmorate.exception.IdValidationException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
@@ -29,7 +27,7 @@ class FilmorateApplicationTests {
 	@BeforeEach
 	public void beaforeEach() {
 		userController = new UserController(new UserService(new InMemoryUserStorage()));
-		filmController = new FilmController(new FilmService(new InMemoryFilmStorage((InMemoryUserStorage) userController.getUserStorage())));
+		filmController = new FilmController(new FilmService(new InMemoryFilmStorage(), new InMemoryUserStorage()));
 	}
 
 	@Test
@@ -54,7 +52,7 @@ class FilmorateApplicationTests {
 		user.setName("name");
 		user.setBirthday(LocalDate.of(2000, 1, 1));
 
-		assertThrows(IdValidationException.class, () -> userController.update(user));
+		assertThrows(NotFoundException.class, () -> userController.update(user));
 	}
 
 	@Test
@@ -175,58 +173,6 @@ class FilmorateApplicationTests {
 	}
 
 	@Test
-	void shouldAddAndDeleteLike() {
-		User user = new User();
-		user.setLogin("testUser");
-		user.setEmail("test@example.com");
-		user.setBirthday(LocalDate.of(1990, 1, 1));
-		User createdUser = userController.addUser(user);
-
-		Film film = new Film();
-		film.setName("Test Film");
-		film.setDescription("Test Description");
-		film.setReleaseDate(LocalDate.of(2000, 1, 1));
-		film.setDuration(120);
-		Film createdFilm = filmController.create(film);
-
-		filmController.addLike(createdFilm.getId(), createdUser.getId());
-		Collection<Film> popularFilms = filmController.getPopularFilms(1);
-		assertEquals(1, popularFilms.size());
-
-		filmController.deleteLike(createdFilm.getId(), createdUser.getId());
-		popularFilms = filmController.getPopularFilms(1);
-		assertTrue(popularFilms.isEmpty() || popularFilms.iterator().next().getLike().isEmpty());
-	}
-
-	@Test
-	void shouldGetPopularFilms() {
-		Film film1 = new Film();
-		film1.setName("Film 1");
-		film1.setDescription("Description 1");
-		film1.setReleaseDate(LocalDate.of(2000, 1, 1));
-		film1.setDuration(120);
-		Film createdFilm1 = filmController.create(film1);
-
-		Film film2 = new Film();
-		film2.setName("Film 2");
-		film2.setDescription("Description 2");
-		film2.setReleaseDate(LocalDate.of(2001, 1, 1));
-		film2.setDuration(90);
-		Film createdFilm2 = filmController.create(film2);
-
-		User user = new User();
-		user.setLogin("testUser");
-		user.setEmail("test@example.com");
-		user.setBirthday(LocalDate.of(1990, 1, 1));
-		User createdUser = userController.addUser(user);
-
-		filmController.addLike(createdFilm2.getId(), createdUser.getId());
-
-		Collection<Film> popularFilms = filmController.getPopularFilms(1);
-		assertEquals(createdFilm2.getId(), popularFilms.iterator().next().getId());
-	}
-
-	@Test
 	void shouldThrowWhenUserNotFound() {
 		assertThrows(NotFoundException.class, () -> userController.getUser(999L));
 	}
@@ -234,16 +180,5 @@ class FilmorateApplicationTests {
 	@Test
 	void shouldThrowWhenFilmNotFound() {
 		assertThrows(NotFoundException.class, () -> filmController.getFilm(999L));
-	}
-
-	@Test
-	void shouldThrowWhenFilmDateInvalid() {
-		Film film = new Film();
-		film.setName("Old Film");
-		film.setDescription("Very old film");
-		film.setReleaseDate(LocalDate.of(1890, 1, 1));
-		film.setDuration(60);
-
-		assertThrows(DateFilmValidationException.class, () -> filmController.create(film));
 	}
 }

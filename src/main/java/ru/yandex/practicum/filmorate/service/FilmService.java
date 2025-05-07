@@ -3,12 +3,11 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.DateFilmValidationException;
-import ru.yandex.practicum.filmorate.exception.IdValidationException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Set;
 
@@ -18,34 +17,21 @@ import java.util.Set;
 public class FilmService {
 
     private final FilmStorage filmStorage;
-
-    private static final LocalDate START_FILM_DATA = LocalDate.of(1895,12,28);
-
+    private final UserStorage userStorage;
 
     public Collection<Film> getAll() {
         return filmStorage.getAll();
     }
 
     public Film getFilm(Long filmId) {
-        if (filmId == null) {
-            log.warn("Нет id");
-            throw new IdValidationException("Id должен быть указан");
-        }
         return filmStorage.getFilm(filmId);
     }
 
     public Film create(Film film) {
-        validate(film);
         return filmStorage.create(film);
     }
 
     public Film update(Film film) {
-        if (film.getId() == null) {
-            log.warn("Нет id");
-            throw new IdValidationException("Id должен быть указан");
-        }
-
-        validate(film);
         return filmStorage.update(film);
     }
 
@@ -54,6 +40,10 @@ public class FilmService {
     }
 
     public Set<Long> addLike(Long filmId, Long userId) {
+        if (!userStorage.existsUserById(userId)) {
+            throw new NotFoundException("Такого пользователя нет");
+        }
+
         filmStorage.addLike(filmId, userId);
         Film film = filmStorage.getFilm(filmId);
         Set<Long> likes = film.getLike();
@@ -61,6 +51,10 @@ public class FilmService {
     }
 
     public Set<Long> deleteLike(Long filmId, Long userId) {
+        if (!userStorage.existsUserById(userId)) {
+            throw new NotFoundException("Такого пользователя нет");
+        }
+
         filmStorage.deleteLike(filmId, userId);
         Film film = filmStorage.getFilm(filmId);
         Set<Long> likes = film.getLike();
@@ -69,12 +63,5 @@ public class FilmService {
 
     public Collection<Film> getPopularFilms(Integer count) {
         return filmStorage.getPopularFilms(count);
-    }
-
-    private void validate(Film film) {
-        if (film.getReleaseDate().isBefore(START_FILM_DATA)) {
-//            log.warn("Дата релиза раньше 1895-12-28");
-            throw new DateFilmValidationException("Дата релиза — не раньше 28 декабря 1895 года");
-        }
     }
 }
