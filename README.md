@@ -5,6 +5,7 @@ Template repository for Filmorate project.
 
 ## ER-diagram
 [ER-диаграмма](https://dbdiagram.io/d/68242e865b2fc4582f817eb1)
+![картинка диаграммы](/Users/dimapetrochenko/Downloads/Untitled.png)
 
 ## Описание таблиц БД
 * film
@@ -57,11 +58,13 @@ Template repository for Filmorate project.
 
 ## Примеры запросов
 	1. Топ два фильма по популярности среди пользователей:
-'''SQL
+'''
+{
 SELECT f.title, COUNT(l.user_id) AS count_likes
 FROM film f
 JOIN likes l ON f.film_id = l.film_id
 GROUP BY f.film_id
 ORDER BY COUNT(l.user_id) desc
 LIMIT 2
+}
 '''
