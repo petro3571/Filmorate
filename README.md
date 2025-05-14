@@ -57,14 +57,4 @@ Template repository for Filmorate project.
 
 
 ## Примеры запросов
-	1. Топ два фильма по популярности среди пользователей:
-'''
-{
-SELECT f.title, COUNT(l.user_id) AS count_likes
-FROM film f
-JOIN likes l ON f.film_id = l.film_id
-GROUP BY f.film_id
-ORDER BY COUNT(l.user_id) desc
-LIMIT 2
-}
-'''
+	1. Топ два фильма по популярности среди пользователей: SELECT f.title, COUNT(l.user_id) AS count_likes FROM film f JOIN likes l ON f.film_id = l.film_id GROUP BY f.film_id ORDER BY COUNT(l.user_id) desc LIMIT 2
