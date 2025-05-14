@@ -5,7 +5,7 @@ Template repository for Filmorate project.
 
 ## ER-diagram
 [ER-диаграмма](https://dbdiagram.io/d/68242e865b2fc4582f817eb1)
-![картинка диаграммы](/Users/dimapetrochenko/Downloads/Untitled.png)
+![картинка диаграммы](/filmoratediagramm.png)
 
 ## Описание таблиц БД
 * film
