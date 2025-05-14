@@ -46,7 +46,7 @@ Template repository for Filmorate project.
 	- внешний ключ film_id — идентификатор фильма;
 	- внешний ключ user_id - идентификатор пользователя.
 
-*friends
+* friends
 	Содержит данные о дружбе пользователей и статуса дружбы
 	Таблица включает такие поля:
 	- первичный ключ id_friends_list - идентификатор записи дружбы пользователей;
@@ -57,7 +57,7 @@ Template repository for Filmorate project.
 
 ## Примеры запросов
 	1. Топ два фильма по популярности среди пользователей:
-'''
+'''SQL
 SELECT f.title, COUNT(l.user_id) AS count_likes
 FROM film f
 JOIN likes l ON f.film_id = l.film_id
