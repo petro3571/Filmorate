@@ -33,7 +33,7 @@ public class UserDbStorage implements UserStorage {
 
     private static final String FIND_BY_ID_QUERY = "SELECT user_id AS id, name AS username, email, login, birthday FROM users WHERE user_id = ?";
 
-    private static final String FIND_BY_EMAIL_QUERY ="SELECT user_id AS id, name AS username, email, login, birthday FROM users WHERE email = ?";
+    private static final String FIND_BY_EMAIL_QUERY = "SELECT user_id AS id, name AS username, email, login, birthday FROM users WHERE email = ?";
 
     private final JdbcTemplate jdbc;
     private final UserRowMapper mapper;
@@ -149,7 +149,7 @@ public class UserDbStorage implements UserStorage {
             for (int idx = 0; idx < params.length; idx++) {
                 ps.setObject(idx + 1, params[idx]);
             }
-            return ps;}, keyHolder);
+            return ps; }, keyHolder);
 
         Long id = keyHolder.getKeyAs(Long.class);
 
