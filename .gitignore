@@ -1,6 +1,7 @@
 *.class
 *.log
 *.jar
+*.DS_Store
 *.war
 *.nar
 *.ear
