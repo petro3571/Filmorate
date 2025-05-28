@@ -1,184 +1,137 @@
 package ru.yandex.practicum.filmorate;
 
-import org.junit.jupiter.api.BeforeEach;
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import ru.yandex.practicum.filmorate.controller.FilmController;
-import ru.yandex.practicum.filmorate.controller.UserController;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
+import org.springframework.context.annotation.Import;
+import ru.yandex.practicum.filmorate.dal.GenreDbStorage;
+import ru.yandex.practicum.filmorate.dal.MpaDbStorage;
+import ru.yandex.practicum.filmorate.dal.mapper.FilmRowMapper;
+import ru.yandex.practicum.filmorate.dal.mapper.GenreRowMapper;
+import ru.yandex.practicum.filmorate.dal.mapper.MpaRowMapper;
+import ru.yandex.practicum.filmorate.dal.mapper.UserRowMapper;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
-import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.dal.FilmDbStorage;
+import ru.yandex.practicum.filmorate.dal.UserDbStorage;
 
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.Set;
-
+import java.util.List;
+import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
-class FilmorateApplicationTests {
-	UserController userController;
-	FilmController filmController;
+@JdbcTest
+@AutoConfigureTestDatabase
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@Import({UserDbStorage.class, FilmDbStorage.class, GenreDbStorage.class, MpaDbStorage.class, UserRowMapper.class, FilmRowMapper.class, GenreRowMapper.class, MpaRowMapper.class})
+class FilmorateDbApplicationTests {
+    private final UserDbStorage userDbStorage;
+    private final FilmDbStorage filmDbStorage;
 
-	@BeforeEach
-	public void beaforeEach() {
-		userController = new UserController(new UserService(new InMemoryUserStorage()));
-		filmController = new FilmController(new FilmService(new InMemoryFilmStorage(), new InMemoryUserStorage()));
-	}
+    private User testUser;
+    private Film testFilm;
 
-	@Test
-	void contextLoads() {
-	}
+    @Test
+    void shouldRunWorkWithUsers() {
+        testUser = new User();
+        testUser.setEmail("test@ya.ru");
+        testUser.setLogin("testLogin");
+        testUser.setName("Test Name");
+        testUser.setBirthday(LocalDate.of(1990, 1, 1));
 
-	@Test
-	void shouldBeNameSameLogin() {
-		User user = new User();
-		user.setLogin("login");
-		user.setEmail("test@example.com");
-		user.setBirthday(LocalDate.of(1996,4,19));
-		userController.addUser(user);
-		assertEquals("login", user.getName());
-	}
+        User createdUser = userDbStorage.saveUser(testUser);
 
-	@Test
-	public void testUserUpdateNotFound() {
-		User user = new User();
-		user.setEmail("test@example.com");
-		user.setLogin("login");
-		user.setName("name");
-		user.setBirthday(LocalDate.of(2000, 1, 1));
+        Optional<User> getUser = userDbStorage.getUser(createdUser.getId());
 
-		assertThrows(NotFoundException.class, () -> userController.update(user));
-	}
+        Collection<User> users = userDbStorage.getAll();
 
-	@Test
-	public void testFilmUpdateNotFound() {
-		Film film = new Film();
-		film.setId(1L);
-		film.setDescription("Description");
-		film.setDuration(1);
-		film.setName("name");
-		film.setReleaseDate(LocalDate.of(2000, 1, 1));
+        assertEquals(getUser.get().getName(), "Test Name");
 
-		assertThrows(NotFoundException.class, () -> filmController.update(film));
-	}
+        assertFalse(users.isEmpty());
 
-	@Test
-	void shouldCreateUserWithEmptyName() {
-		User user = new User();
-		user.setLogin("testLogin");
-		user.setEmail("test@example.com");
-		user.setBirthday(LocalDate.of(1990, 1, 1));
+        createdUser.setName("New Test Name");
 
-		User createdUser = userController.addUser(user);
-		assertEquals(user.getLogin(), createdUser.getName());
-	}
+        User updateUser = userDbStorage.updateUser(createdUser);
 
-	@Test
-	void shouldCreateUserWithName() {
-		User user = new User();
-		user.setLogin("testLogin");
-		user.setName("Test Name");
-		user.setEmail("test@example.com");
-		user.setBirthday(LocalDate.of(1990, 1, 1));
+        assertEquals(updateUser.getName(), "New Test Name");
 
-		User createdUser = userController.addUser(user);
-		assertEquals("Test Name", createdUser.getName());
-	}
+        User newTestUser = new User();
 
-	@Test
-	void shouldUpdateUser() {
-		User user = new User();
-		user.setLogin("testLogin");
-		user.setEmail("test@example.com");
-		user.setBirthday(LocalDate.of(1990, 1, 1));
-		User createdUser = userController.addUser(user);
+        newTestUser.setEmail("test1@ya.ru");
+        newTestUser.setLogin("testLogin1");
+        newTestUser.setName("Test Name1");
+        newTestUser.setBirthday(LocalDate.of(1990, 1, 2));
 
-		createdUser.setName("Updated Name");
-		User updatedUser = userController.update(createdUser);
+        userDbStorage.saveUser(newTestUser);
 
-		assertEquals("Updated Name", updatedUser.getName());
-	}
+        userDbStorage.addFriend(updateUser.getId(), newTestUser.getId());
+        List<Optional<User>> newListFriends = userDbStorage.getUserFriends(updateUser.getId());
 
-	@Test
-	void shouldGetAllUsers() {
-		User user1 = new User();
-		user1.setLogin("user1");
-		user1.setEmail("user1@example.com");
-		user1.setBirthday(LocalDate.of(1990, 1, 1));
-		userController.addUser(user1);
+        assertEquals(1, newListFriends.size());
 
-		User user2 = new User();
-		user2.setLogin("user2");
-		user2.setEmail("user2@example.com");
-		user2.setBirthday(LocalDate.of(1995, 1, 1));
-		userController.addUser(user2);
+        userDbStorage.deleteFriend(updateUser.getId(), newTestUser.getId());
+        newListFriends = userDbStorage.getUserFriends(updateUser.getId());
 
-		Collection<User> users = userController.getAllUsers();
-		assertEquals(2, users.size());
-	}
+        assertEquals(0, newListFriends.size());
+    }
 
-	@Test
-	void shouldAddAndDeleteFriend() {
-		User user1 = new User();
-		user1.setLogin("user1");
-		user1.setEmail("user1@example.com");
-		user1.setBirthday(LocalDate.of(1990, 1, 1));
-		User createdUser1 = userController.addUser(user1);
+    @Test
+    void shouldRunWorkWithFilms() {
+        testUser = new User();
+        testUser.setEmail("test@ya.ru");
+        testUser.setLogin("testLogin");
+        testUser.setName("Test Name");
+        testUser.setBirthday(LocalDate.of(1990, 1, 1));
 
-		User user2 = new User();
-		user2.setLogin("user2");
-		user2.setEmail("user2@example.com");
-		user2.setBirthday(LocalDate.of(1995, 1, 1));
-		User createdUser2 = userController.addUser(user2);
+        testFilm = new Film();
+        testFilm.setName("Test Film");
+        testFilm.setDescription("Test Description");
+        testFilm.setReleaseDate(LocalDate.of(2000, 1, 1));
+        testFilm.setDuration(120);
+        testFilm.setMpa(new Mpa(1, null));
 
-		userController.addFriend(createdUser1.getId(), createdUser2.getId());
-		Set<User> friends = userController.getUserFriends(createdUser1.getId());
-		assertEquals(1, friends.size());
+        User createdUser = userDbStorage.saveUser(testUser);
 
-		userController.deleteFriend(createdUser1.getId(), createdUser2.getId());
-		friends = userController.getUserFriends(createdUser1.getId());
-		assertTrue(friends.isEmpty());
-	}
+        Film createdFilm = filmDbStorage.create(testFilm);
 
-	@Test
-	void shouldCreateFilm() {
-		Film film = new Film();
-		film.setName("Test Film");
-		film.setDescription("Test Description");
-		film.setReleaseDate(LocalDate.of(2000, 1, 1));
-		film.setDuration(120);
+        Optional<Film> getFilm = filmDbStorage.getFilm(createdFilm.getId());
 
-		Film createdFilm = filmController.create(film);
-		assertNotNull(createdFilm.getId());
-	}
+        Collection<Film> films = filmDbStorage.getAll();
 
-	@Test
-	void shouldUpdateFilm() {
-		Film film = new Film();
-		film.setName("Test Film");
-		film.setDescription("Test Description");
-		film.setReleaseDate(LocalDate.of(2000, 1, 1));
-		film.setDuration(120);
-		Film createdFilm = filmController.create(film);
+        assertFalse(films.isEmpty());
 
-		createdFilm.setName("Updated Film");
-		Film updatedFilm = filmController.update(createdFilm);
+        assertEquals(getFilm.get().getName(), "Test Film");
 
-		assertEquals("Updated Film", updatedFilm.getName());
-	}
+        createdFilm.setName("Test Film Name");
 
-	@Test
-	void shouldThrowWhenUserNotFound() {
-		assertThrows(NotFoundException.class, () -> userController.getUser(999L));
-	}
+        Film updatedFilm = filmDbStorage.update(createdFilm);
 
-	@Test
-	void shouldThrowWhenFilmNotFound() {
-		assertThrows(NotFoundException.class, () -> filmController.getFilm(999L));
-	}
+        assertEquals(updatedFilm.getName(), "Test Film Name");
+
+        assertEquals(films.size(), 1);
+
+        Film testFilm2 = new Film();
+        testFilm2.setName("Test Film2");
+        testFilm2.setDescription("Test Description2");
+        testFilm2.setReleaseDate(LocalDate.of(2001, 1, 1));
+        testFilm2.setDuration(150);
+        testFilm2.setMpa(new Mpa(2, null));
+
+
+        Film newCreatedFilm = filmDbStorage.create(testFilm2);
+
+        filmDbStorage.addLike(updatedFilm.getId(), createdUser.getId());
+
+        Collection<Film> popularFilm = filmDbStorage.getPopularFilms(1);
+
+        assertEquals(popularFilm.size(), 1);
+
+        Film newFilm = popularFilm.stream().findFirst().get();
+
+        assertEquals(newFilm.getName(), "Test Film Name");
+    }
 }
