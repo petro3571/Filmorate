@@ -16,6 +16,9 @@ target/
 /.class
 /.jar
 /.DS_Store
+src/.DS_Store
+src/main/.DS_Store
+src/main/java/.DS_Store
 
 ### STS ###
 .apt_generated
