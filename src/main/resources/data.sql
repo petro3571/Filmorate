@@ -1,34 +1,14 @@
-INSERT INTO genre (id, name)
-VALUES ( 1, 'Комедия');
+MERGE INTO genre (id, name)
+    values (1, 'Комедия'),
+            (2, 'Драма'),
+            (3, 'Мультфильм'),
+            (4, 'Триллер'),
+            (5, 'Документальный'),
+            (6,'Боевик');
 
-INSERT INTO genre (id, name)
-VALUES (2, 'Драма');
-
-INSERT INTO genre (id, name)
-VALUES ( 3, 'Мультфильм');
-
-INSERT INTO genre (id, name)
-VALUES (4, 'Триллер');
-
-INSERT INTO genre (id, name)
-VALUES (5, 'Документальный');
-
-INSERT INTO genre (id, name)
-VALUES ( 6,'Боевик');
-
-INSERT INTO mpa (id,name)
-VALUES ( 1,'G');
-
-INSERT INTO mpa (id,name)
-VALUES (2, 'PG');
-
-INSERT INTO mpa (id,name)
-VALUES ( 3, 'PG-13');
-
-INSERT INTO mpa (id,name)
-VALUES ( 4, 'R');
-
-INSERT INTO mpa (id,name)
-VALUES ( 5, 'NC-17');
-
-SELECT * FROM mpa;
+MERGE INTO mpa (id, name)
+    values ( 1,'G'),
+            (2, 'PG'),
+            (3, 'PG-13'),
+            (4, 'R'),
+            (5, 'NC-17');
