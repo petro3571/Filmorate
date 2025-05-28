@@ -32,7 +32,7 @@ public final class UserMapper {
     }
 
     public static User updateUserFields(User user, UpdateUserRequest request) {
-        if(request.hasId()) {
+        if (request.hasId()) {
             user.setId(request.getId());
         }
 
