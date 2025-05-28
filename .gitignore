@@ -1,7 +1,6 @@
 *.class
 *.log
 *.jar
-*.DS_Store
 *.war
 *.nar
 *.ear
@@ -14,6 +13,9 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+/.class
+/.jar
+/.DS_Store
 
 ### STS ###
 .apt_generated
