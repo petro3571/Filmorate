@@ -66,6 +66,7 @@ public class FilmDbService {
         log.info("Пользователи с id " + userId + " удалил лайк фильму с id " + filmId + " .");
 
     }
+
     public Collection<Film> getPopularFilms(Integer count) {
         return filmDbStorage.getPopularFilms(count);
     }
