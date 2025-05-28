@@ -32,7 +32,7 @@ public class FilmDbStorage implements FilmStorage {
 
     private static final String NEWFIND = "SELECT f.film_id, f.title, f.description, f.release_date, f.duration, f.mpa_id, m.name FROM films AS f left JOIN mpa AS m ON f.MPA_id = m.id WHERE f.film_id = ?";
 
-    private static final String LIKE_QUERY ="INSERT INTO likes(film_id, user_id) VALUES(?, ?)";
+    private static final String LIKE_QUERY = "INSERT INTO likes(film_id, user_id) VALUES(?, ?)";
 
     private static final String DELETE_LIKE_QUERY = "DELETE FROM likes WHERE film_id = ? AND user_id = ?";
 
