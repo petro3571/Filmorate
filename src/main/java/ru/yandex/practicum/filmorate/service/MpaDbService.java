@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.dal.MpaDbStorage;
 import ru.yandex.practicum.filmorate.dto.MpaDto;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.mapper.MpaMapper;
+import ru.yandex.practicum.filmorate.storage.MpaStorage;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,7 +14,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class MpaDbService {
-    private final MpaDbStorage mpaDbStorage;
+    private final MpaStorage mpaDbStorage;
 
     public MpaDbService(MpaDbStorage mpaDbStorage) {
         this.mpaDbStorage = mpaDbStorage;

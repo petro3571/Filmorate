@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.dal.mapper.GenreRowMapper;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.storage.GenreStorage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,17 +17,19 @@ import java.util.stream.Collectors;
 @Repository
 @RequiredArgsConstructor
 @Qualifier("genreDbStorage")
-public class GenreDbStorage {
+public class GenreDbStorage implements GenreStorage {
     private static final String FIND_ALL_QUERY = "SELECT id, name FROM genre";
     private static final String FIND_BY_ID_QUERY = "SELECT id, name FROM genre WHERE id = ?";
     private static final String FIND_FILM_GENRES = "SELECT genre_id from film_genre where film_id = ?";
     private final JdbcTemplate jdbc;
     private final GenreRowMapper mapper;
 
+    @Override
     public List<Genre> getAll() {
         return jdbc.query(FIND_ALL_QUERY, mapper);
     }
 
+    @Override
     public Optional<Genre> getGenre(Integer genreId) {
         try {
             Genre genre = jdbc.queryForObject(FIND_BY_ID_QUERY, mapper, genreId);
@@ -36,6 +39,7 @@ public class GenreDbStorage {
         }
     }
 
+    @Override
     public List<Genre> getFilmGenres(Long filmId) {
         List<Optional<Genre>> newlist = jdbc.queryForList(FIND_FILM_GENRES, Integer.class, filmId).stream().map(g -> getGenre(g)).collect(Collectors.toList());
         List<Genre> listGenres = new ArrayList<>();

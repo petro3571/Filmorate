@@ -1,15 +1,12 @@
 package ru.yandex.practicum.filmorate.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Id;
 import lombok.Data;
 import jakarta.validation.constraints.*;
 import ru.yandex.practicum.filmorate.annotation.RealeaseDateMin;
 
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Film.
@@ -35,7 +32,4 @@ public class Film {
     private Mpa mpa;
 
     private List<Genre> genres;
-
-    @JsonIgnore
-    private Set<Long> like = new HashSet<>();
 }

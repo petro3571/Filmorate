@@ -10,12 +10,12 @@ import ru.yandex.practicum.filmorate.dal.mapper.FilmRowMapper;
 import ru.yandex.practicum.filmorate.exception.InternalServerException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
@@ -24,25 +24,27 @@ public class FilmDbStorage implements FilmStorage {
     private static final String INSERT_QUERY = "INSERT INTO films(title, description, release_date, duration, MPA_id)" +
             "VALUES (?, ?, ?, ?, ?)";
 
-    private static final String FIND_ALL_QUERY = "SELECT f.film_id, f.title, f.description, f.release_date, f.duration, f.mpa_id, m.name FROM films AS f left JOIN mpa AS m ON f.MPA_id = m.id";
+    private static final String FIND_ALL_QUERY = "SELECT f.film_id, f.title, f.description, f.release_date, " +
+            "f.duration, f.mpa_id, m.name FROM films AS f left JOIN mpa AS m ON f.MPA_id = m.id";
 
-    private static final String UPDATE_QUERY = "UPDATE films SET title = ?, description = ?, release_date = ?, duration = ?, mpa_id = ? WHERE film_id = ?";
+    private static final String UPDATE_QUERY = "UPDATE films SET title = ?, description = ?, release_date = ?, " +
+            "duration = ?, mpa_id = ? WHERE film_id = ?";
 
     private static final String DELETE_QUERY = "DELETE FROM films WHERE film_id = ?";
 
-    private static final String NEWFIND = "SELECT f.film_id, f.title, f.description, f.release_date, f.duration, f.mpa_id, m.name FROM films AS f left JOIN mpa AS m ON f.MPA_id = m.id WHERE f.film_id = ?";
+    private static final String NEWFIND = "SELECT f.film_id, f.title, f.description, f.release_date, f.duration, " +
+        "f.mpa_id, m.name FROM films AS f left JOIN mpa AS m ON f.MPA_id = m.id WHERE f.film_id = ?";
 
     private static final String LIKE_QUERY = "INSERT INTO likes(film_id, user_id) VALUES(?, ?)";
 
     private static final String DELETE_LIKE_QUERY = "DELETE FROM likes WHERE film_id = ? AND user_id = ?";
 
-    private static final String POPULAR_QUERY = "SELECT f.*, m.name AS mpa_name, COUNT(l.user_id) AS likes_count FROM films f LEFT JOIN likes l ON f.film_id = l.film_id JOIN mpa m ON f.mpa_id = m.id GROUP BY f.film_id ORDER BY likes_count DESC LIMIT ?";
+    private static final String POPULAR_QUERY = "SELECT f.*, m.name AS mpa_name, COUNT(l.user_id) AS likes_count " +
+            "FROM films f LEFT JOIN likes l ON f.film_id = l.film_id JOIN mpa m ON f.mpa_id = m.id " +
+            "GROUP BY f.film_id ORDER BY likes_count DESC LIMIT ?";
 
     private final JdbcTemplate jdbc;
     private final FilmRowMapper mapper;
-    private final GenreDbStorage genreDbStorage;
-    private final MpaDbStorage mpaDbStorage;
-    private final UserDbStorage userDbStorage;
 
     @Override
     public Collection<Film> getAll() {
@@ -51,18 +53,6 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film create(Film film) {
-        if (!(mpaDbStorage.getMpa(film.getMpa().getId()).isPresent())) {
-            throw new NotFoundException("Рейтинга с id " + film.getMpa().getId() + " нет.");
-        }
-
-        if (film.getGenres() != null && !film.getGenres().isEmpty()) {
-            for (Genre genre : film.getGenres()) {
-                if (!genreDbStorage.getGenre(genre.getId()).isPresent()) {
-                    throw new NotFoundException("Жанра с id " + genre.getId() + " нет.");
-                }
-            }
-        }
-
         long id = insert(
                 INSERT_QUERY,
                 film.getName(),
@@ -78,18 +68,6 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film update(Film film) {
-        if (!(mpaDbStorage.getMpa(film.getMpa().getId()).isPresent())) {
-            throw new NotFoundException("Рейтинга с id " + film.getMpa().getId() + " нет.");
-        }
-
-        if (film.getGenres() != null && !film.getGenres().isEmpty()) {
-            for (Genre genre : film.getGenres()) {
-                if (!genreDbStorage.getGenre(genre.getId()).isPresent()) {
-                    throw new NotFoundException("Жанра с id " + genre.getId() + " нет.");
-                }
-            }
-        }
-
         update(
                 UPDATE_QUERY,
                 film.getName(),
@@ -122,14 +100,12 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public void addLike(Long filmId, Long userId) {
         existFilmById(filmId);
-        userDbStorage.existsUserById(userId);
         jdbc.update(LIKE_QUERY, filmId, userId);
     }
 
     @Override
     public void deleteLike(Long filmId, Long userId) {
         existFilmById(filmId);
-        userDbStorage.existsUserById(userId);
         jdbc.update(DELETE_LIKE_QUERY, filmId, userId);
     }
 
@@ -181,11 +157,11 @@ public class FilmDbStorage implements FilmStorage {
 
         String sql = "INSERT INTO film_genre(film_id, genre_id) VALUES (?, ?)";
 
-        List<Genre> newList = film.getGenres();
+        List<Object[]> batchArgs = film.getGenres().stream()
+                .map(genre -> new Object[]{film.getId(), genre.getId()})
+                .collect(Collectors.toList());
 
-        for (Genre genre : newList) {
-            jdbc.update(sql,film.getId(), genre.getId());
-        }
+        jdbc.batchUpdate(sql, batchArgs);
     }
 
     private void updateGenres(Film film) {
@@ -197,10 +173,10 @@ public class FilmDbStorage implements FilmStorage {
 
         String sql = "INSERT INTO film_genre(film_id, genre_id) VALUES (?, ?)";
 
-        List<Genre> newList = film.getGenres();
+        List<Object[]> batchArgs = film.getGenres().stream()
+                .map(genre -> new Object[]{film.getId(), genre.getId()})
+                .collect(Collectors.toList());
 
-        for (Genre genre : newList) {
-            jdbc.update(sql,film.getId(), genre.getId());
-        }
+        jdbc.batchUpdate(sql, batchArgs);
     }
 }

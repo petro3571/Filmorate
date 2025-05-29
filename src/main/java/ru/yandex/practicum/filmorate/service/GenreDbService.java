@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.dal.GenreDbStorage;
 import ru.yandex.practicum.filmorate.dto.GenreDto;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.mapper.GenreMapper;
+import ru.yandex.practicum.filmorate.storage.GenreStorage;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,7 +14,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class GenreDbService {
-    private final GenreDbStorage genreDbStorage;
+    private final GenreStorage genreDbStorage;
 
     public GenreDbService(GenreDbStorage genreDbStorage) {
         this.genreDbStorage = genreDbStorage;

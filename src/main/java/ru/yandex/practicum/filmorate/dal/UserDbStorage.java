@@ -25,15 +25,19 @@ public class UserDbStorage implements UserStorage {
     private static final String INSERT_QUERY = "INSERT INTO users(name, email, login, birthday)" +
             "VALUES (?, ?, ?, ?)";
 
-    private static final String UPDATE_QUERY = "UPDATE users SET name = ?, email = ?, login = ?, birthday = ? WHERE user_id = ?";
+    private static final String UPDATE_QUERY = "UPDATE users SET name = ?, email = ?, login = ?, birthday = ? " +
+            "WHERE user_id = ?";
 
     private static final String DELETE_QUERY = "DELETE FROM users WHERE user_id = ?";
 
-    private static final String FIND_ALL_QUERY = "SELECT user_id AS id, name AS username, email, login, birthday FROM users";
+    private static final String FIND_ALL_QUERY = "SELECT user_id AS id, name AS username, email, login, birthday " +
+            "FROM users";
 
-    private static final String FIND_BY_ID_QUERY = "SELECT user_id AS id, name AS username, email, login, birthday FROM users WHERE user_id = ?";
+    private static final String FIND_BY_ID_QUERY = "SELECT user_id AS id, name AS username, email, login, birthday " +
+            "FROM users WHERE user_id = ?";
 
-    private static final String FIND_BY_EMAIL_QUERY = "SELECT user_id AS id, name AS username, email, login, birthday FROM users WHERE email = ?";
+    private static final String FIND_BY_EMAIL_QUERY = "SELECT user_id AS id, name AS username, email, login, birthday " +
+            "FROM users WHERE email = ?";
 
     private final JdbcTemplate jdbc;
     private final UserRowMapper mapper;
@@ -94,6 +98,7 @@ public class UserDbStorage implements UserStorage {
         update(query, userId, friendId);
     }
 
+    @Override
     public void confirmFriend(Long userId, Long friendId) {
         existsUserById(userId);
         existsUserById(friendId);
@@ -131,10 +136,10 @@ public class UserDbStorage implements UserStorage {
                 userId + " не найден."));
     }
 
+    @Override
     public Optional<User> findByEmail(String email) {
-        String query = "SELECT user_id AS id, name AS username, email, login, birthday FROM users WHERE email = ?";
         try {
-            User user = jdbc.queryForObject(query, mapper, email);
+            User user = jdbc.queryForObject(FIND_BY_EMAIL_QUERY, mapper, email);
             return Optional.ofNullable(user);
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();

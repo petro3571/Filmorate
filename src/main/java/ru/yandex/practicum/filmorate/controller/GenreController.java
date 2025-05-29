@@ -12,16 +12,16 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/genres")
 public class GenreController {
-    private final GenreDbService genreDbService;
+    private final GenreDbService genreService;
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<GenreDto> getAll() {
-        return genreDbService.getAll();
+        return genreService.getAll();
     }
 
     @GetMapping("/{genreId}")
     public GenreDto getGenre(@PathVariable("genreId") int genreId) {
-        return genreDbService.getGenre(genreId);
+        return genreService.getGenre(genreId);
     }
 }

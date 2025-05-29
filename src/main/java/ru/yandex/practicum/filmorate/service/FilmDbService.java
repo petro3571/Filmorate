@@ -3,13 +3,17 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.dal.FilmDbStorage;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.dto.NewFilmRequest;
 import ru.yandex.practicum.filmorate.dto.UpdateFilmRequest;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.GenreStorage;
+import ru.yandex.practicum.filmorate.storage.MpaStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -19,7 +23,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class FilmDbService {
 
-    private final FilmDbStorage filmDbStorage;
+    private final FilmStorage filmDbStorage;
+    private final GenreStorage genreDbStorage;
+    private final MpaStorage mpaDbStorage;
+    private final UserStorage userDbStorage;
 
     public Collection<FilmDto> getAll() {
         return filmDbStorage.getAll()
@@ -36,6 +43,18 @@ public class FilmDbService {
     public FilmDto create(NewFilmRequest request) {
         Film film = FilmMapper.mapToFilm(request);
 
+        if (!(mpaDbStorage.getMpa(film.getMpa().getId()).isPresent())) {
+            throw new NotFoundException("Рейтинга с id " + film.getMpa().getId() + " нет.");
+        }
+
+        if (film.getGenres() != null && !film.getGenres().isEmpty()) {
+            for (Genre genre : film.getGenres()) {
+                if (!genreDbStorage.getGenre(genre.getId()).isPresent()) {
+                    throw new NotFoundException("Жанра с id " + genre.getId() + " нет.");
+                }
+            }
+        }
+
         film = filmDbStorage.create(film);
 
         return FilmMapper.mapToFilmDto(film);
@@ -46,6 +65,19 @@ public class FilmDbService {
         if (!filmDbStorage.getFilm(updateFilm.getId()).isPresent()) {
             throw new NotFoundException("Фильма с id " + updateFilm.getId() + "не найден.");
         }
+
+        if (!(mpaDbStorage.getMpa(updateFilm.getMpa().getId()).isPresent())) {
+            throw new NotFoundException("Рейтинга с id " + updateFilm.getMpa().getId() + " нет.");
+        }
+
+        if (updateFilm.getGenres() != null && !updateFilm.getGenres().isEmpty()) {
+            for (Genre genre : updateFilm.getGenres()) {
+                if (!genreDbStorage.getGenre(genre.getId()).isPresent()) {
+                    throw new NotFoundException("Жанра с id " + genre.getId() + " нет.");
+                }
+            }
+        }
+
         updateFilm = filmDbStorage.update(updateFilm);
         return FilmMapper.mapToFilmDto(updateFilm);
     }
@@ -57,11 +89,13 @@ public class FilmDbService {
     }
 
     public void addLike(Long filmId, Long userId) {
+        userDbStorage.existsUserById(userId);
         filmDbStorage.addLike(filmId, userId);
         log.info("Пользователи с id " + userId + " поставил лайк фильму с id " + filmId + " .");
     }
 
     public void deleteLike(Long filmId, Long userId) {
+        userDbStorage.existsUserById(userId);
         filmDbStorage.deleteLike(filmId, userId);
         log.info("Пользователи с id " + userId + " удалил лайк фильму с id " + filmId + " .");
 

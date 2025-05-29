@@ -12,16 +12,16 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/mpa")
 public class MpaController {
-    private final MpaDbService mpaDbService;
+    private final MpaDbService mpaService;
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<MpaDto> getAll() {
-        return mpaDbService.getAll();
+        return mpaService.getAll();
     }
 
     @GetMapping("/{mpaId}")
     public MpaDto getMpa(@PathVariable("mpaId") int mpaId) {
-        return mpaDbService.getMpa(mpaId);
+        return mpaService.getMpa(mpaId);
     }
 }

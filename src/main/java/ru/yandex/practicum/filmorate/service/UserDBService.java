@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.exception.DataAlreadyExistException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.mapper.UserMapper;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,7 +19,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class UserDBService {
-    private final UserDbStorage userDbStorage;
+    private final UserStorage userDbStorage;
 
     public UserDBService(UserDbStorage userDbStorage) {
         this.userDbStorage = userDbStorage;

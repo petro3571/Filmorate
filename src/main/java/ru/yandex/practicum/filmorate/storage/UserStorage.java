@@ -25,5 +25,9 @@ public interface UserStorage {
 
     List<Optional<User>> getSameFriends(Long userId, Long otherId);
 
+    Optional<User> findByEmail(String email);
+
+    void confirmFriend(Long userId, Long otherId);
+
     void existsUserById(Long userId);
 }
