@@ -31,13 +31,17 @@ public class FilmDbService {
     public Collection<FilmDto> getAll() {
         return filmDbStorage.getAll()
                 .stream()
-                .map(FilmMapper::mapToFilmDto)
+                .map(f -> this.getFilm(f.getId()))
                 .collect(Collectors.toList());
     }
 
     public FilmDto getFilm(Long filmId) {
-        return filmDbStorage.getFilm(filmId).map(FilmMapper::mapToFilmDto).orElseThrow(() -> new NotFoundException("Фильм с ID " +
+        FilmDto filmDto =  filmDbStorage.getFilm(filmId).map(FilmMapper::mapToFilmDto).orElseThrow(() -> new NotFoundException("Фильм с ID " +
                 filmId + " не найден."));
+
+        filmDto.setGenres(genreDbStorage.getFilmGenres(filmId));
+
+        return filmDto;
     }
 
     public FilmDto create(NewFilmRequest request) {
@@ -56,6 +60,8 @@ public class FilmDbService {
         }
 
         film = filmDbStorage.create(film);
+
+        film.setGenres(genreDbStorage.getFilmGenres(film.getId()));
 
         return FilmMapper.mapToFilmDto(film);
     }
@@ -79,11 +85,15 @@ public class FilmDbService {
         }
 
         updateFilm = filmDbStorage.update(updateFilm);
+
+        updateFilm.setGenres(genreDbStorage.getFilmGenres(updateFilm.getId()));
+
         return FilmMapper.mapToFilmDto(updateFilm);
     }
 
     public FilmDto deleteFilm(Long filmId) {
         Film film = filmDbStorage.getFilm(filmId).orElseThrow(() -> new NotFoundException("Фильма с id " + filmId + " нет."));
+        film.setGenres(genreDbStorage.getFilmGenres(film.getId()));
         filmDbStorage.deleteFilm(filmId);
         return FilmMapper.mapToFilmDto(film);
     }

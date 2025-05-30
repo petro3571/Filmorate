@@ -9,10 +9,8 @@ import ru.yandex.practicum.filmorate.dal.mapper.GenreRowMapper;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.GenreStorage;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
@@ -41,13 +39,10 @@ public class GenreDbStorage implements GenreStorage {
 
     @Override
     public List<Genre> getFilmGenres(Long filmId) {
-        List<Optional<Genre>> newlist = jdbc.queryForList(FIND_FILM_GENRES, Integer.class, filmId).stream().map(g -> getGenre(g)).collect(Collectors.toList());
-        List<Genre> listGenres = new ArrayList<>();
-        for (Optional<Genre> g : newlist) {
-            if (g.isPresent()) {
-                listGenres.add(g.get());
-            }
-        }
-        return listGenres;
+        String sql = "SELECT g.id AS id, g.name AS name " +
+                "FROM film_genre fg JOIN genre g ON fg.genre_id = g.id " +
+                "WHERE fg.film_id = ? GROUP BY id ORDER BY id";
+
+        return jdbc.query(sql, mapper, filmId);
     }
 }

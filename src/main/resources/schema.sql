@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS MPA (
             description VARCHAR(255) NOT NULL,
             release_date DATE NOT NULL,
             duration INTEGER NOT NULL,
-            MPA_id INTEGER REFERENCES mpa
+            MPA_id INTEGER REFERENCES mpa ON DELETE SET NULL
           );
 
 CREATE TABLE IF NOT EXISTS genre (
@@ -34,8 +34,8 @@ CREATE TABLE IF NOT EXISTS film_genre (
 
 CREATE TABLE IF NOT EXISTS likes (
 			id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-            film_id INTEGER REFERENCES films,
-            user_id INTEGER REFERENCES users
+            film_id INTEGER REFERENCES films ON DELETE CASCADE,
+            user_id INTEGER REFERENCES users ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS friends (
