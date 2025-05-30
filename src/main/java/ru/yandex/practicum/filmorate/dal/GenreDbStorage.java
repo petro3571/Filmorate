@@ -18,7 +18,9 @@ import java.util.Optional;
 public class GenreDbStorage implements GenreStorage {
     private static final String FIND_ALL_QUERY = "SELECT id, name FROM genre";
     private static final String FIND_BY_ID_QUERY = "SELECT id, name FROM genre WHERE id = ?";
-    private static final String FIND_FILM_GENRES = "SELECT genre_id from film_genre where film_id = ?";
+    private static final String FIND_FILM_GENRES = "SELECT g.id AS id, g.name AS name " +
+            "FROM film_genre fg JOIN genre g ON fg.genre_id = g.id " +
+            "WHERE fg.film_id = ? GROUP BY id ORDER BY id";
     private final JdbcTemplate jdbc;
     private final GenreRowMapper mapper;
 
@@ -39,10 +41,6 @@ public class GenreDbStorage implements GenreStorage {
 
     @Override
     public List<Genre> getFilmGenres(Long filmId) {
-        String sql = "SELECT g.id AS id, g.name AS name " +
-                "FROM film_genre fg JOIN genre g ON fg.genre_id = g.id " +
-                "WHERE fg.film_id = ? GROUP BY id ORDER BY id";
-
-        return jdbc.query(sql, mapper, filmId);
+        return jdbc.query(FIND_FILM_GENRES, mapper, filmId);
     }
 }
