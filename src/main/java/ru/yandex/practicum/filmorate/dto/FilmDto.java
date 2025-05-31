@@ -1,29 +1,30 @@
-package ru.yandex.practicum.filmorate.model;
+package ru.yandex.practicum.filmorate.dto;
 
-import jakarta.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
-import jakarta.validation.constraints.*;
 import ru.yandex.practicum.filmorate.annotation.RealeaseDateMin;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.time.LocalDate;
 import java.util.Set;
 
-/**
- * Film.
- */
 @Data
-public class Film {
-    @NotNull(groups = UpdateGroup.class)
-    @Id
+public class FilmDto {
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id;
 
-    @NotBlank(message = "Название фильма не может быть пустым.")
+    @NotBlank
     private String name;
 
     @Size(max = 200, message = "Описание не должно превышать 200 символов.")
     private String description;
 
     @RealeaseDateMin
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private LocalDate releaseDate;
 
     @Positive(message = "Продолжительность должна быть положительной.")
