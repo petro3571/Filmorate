@@ -29,9 +29,21 @@ public class FilmDbService {
     private final UserStorage userDbStorage;
 
     public Collection<FilmDto> getAll() {
-        return filmDbStorage.getAll()
+        Collection<Film> films = filmDbStorage.getAll();
+
+        if (films.isEmpty()) {
+            throw new NotFoundException("Фильмы не найдены.");
+        }
+
+        List<Long> listFilmIds = films.stream().map(Film::getId).collect(Collectors.toList());
+
+        Map<Long, Set<Genre>> genresForFilms = genreDbStorage.getGenresForFilms(listFilmIds);
+
+        films.forEach(film -> film.setGenres(genresForFilms.getOrDefault(film.getId(), new HashSet<>())));
+
+       return films
                 .stream()
-                .map(f -> this.getFilm(f.getId()))
+                .map(FilmMapper::mapToFilmDto)
                 .collect(Collectors.toList());
     }
 
@@ -112,6 +124,18 @@ public class FilmDbService {
     }
 
     public Collection<Film> getPopularFilms(Integer count) {
-        return filmDbStorage.getPopularFilms(count);
+        Collection<Film> popularfilms = filmDbStorage.getPopularFilms(count);
+
+        if (popularfilms.isEmpty()) {
+            throw new NotFoundException("Фильмы не найдены.");
+        }
+
+        List<Long> listFilmIds = popularfilms.stream().map(Film::getId).collect(Collectors.toList());
+
+        Map<Long, Set<Genre>> genresForFilms = genreDbStorage.getGenresForFilms(listFilmIds);
+
+        popularfilms.forEach(film -> film.setGenres(genresForFilms.getOrDefault(film.getId(), new HashSet<>())));
+
+        return popularfilms;
     }
 }

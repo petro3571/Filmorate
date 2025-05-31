@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 import ru.yandex.practicum.filmorate.dto.*;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -26,7 +26,7 @@ public final class FilmMapper {
         if (!request.getGenres().isEmpty()) {
             film.setGenres(request.getGenres());
         } else {
-            film.setGenres(new ArrayList<>());
+            film.setGenres(new HashSet<>());
         }
 
         return film;

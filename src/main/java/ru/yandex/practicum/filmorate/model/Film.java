@@ -6,7 +6,7 @@ import jakarta.validation.constraints.*;
 import ru.yandex.practicum.filmorate.annotation.RealeaseDateMin;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Set;
 
 /**
  * Film.
@@ -31,5 +31,5 @@ public class Film {
 
     private Mpa mpa;
 
-    private List<Genre> genres;
+    private Set<Genre> genres;
 }

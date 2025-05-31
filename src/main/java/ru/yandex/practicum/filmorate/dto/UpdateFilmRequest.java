@@ -10,8 +10,8 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 public class UpdateFilmRequest {
@@ -32,7 +32,7 @@ public class UpdateFilmRequest {
 
     private Mpa mpa;
 
-    private List<Genre> genres = new ArrayList<>();
+    private Set<Genre> genres = new HashSet<>();
 
     public boolean hasId() {
         return !(id == null);
