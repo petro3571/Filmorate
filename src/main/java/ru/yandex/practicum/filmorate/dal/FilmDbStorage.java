@@ -21,19 +21,19 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Qualifier("filmDbStorage")
 public class FilmDbStorage implements FilmStorage {
-    private static final String INSERT_QUERY = "INSERT INTO films(title, description, release_date, duration, MPA_id)" +
-            "VALUES (?, ?, ?, ?, ?)";
+    private static final String INSERT_QUERY = "INSERT INTO films(title, description, release_date, duration, MPA_id, director) " +
+            "VALUES (?, ?, ?, ?, ?, ?)";
 
     private static final String FIND_ALL_QUERY = "SELECT f.film_id, f.title, f.description, f.release_date, " +
-            "f.duration, f.mpa_id, m.name FROM films AS f left JOIN mpa AS m ON f.MPA_id = m.id";
+            "f.duration, f.mpa_id, m.name, f.director FROM films AS f left JOIN mpa AS m ON f.MPA_id = m.id";
 
     private static final String UPDATE_QUERY = "UPDATE films SET title = ?, description = ?, release_date = ?, " +
-            "duration = ?, mpa_id = ? WHERE film_id = ?";
+            "duration = ?, mpa_id = ?, director = ? WHERE WHERE film_id = ?";
 
     private static final String DELETE_QUERY = "DELETE FROM films WHERE film_id = ?";
 
     private static final String NEWFIND = "SELECT f.film_id, f.title, f.description, f.release_date, f.duration, " +
-            "f.mpa_id, m.name FROM films AS f left JOIN mpa AS m ON f.MPA_id = m.id WHERE f.film_id = ?";
+            "f.mpa_id, m.name, f.director FROM films AS f left JOIN mpa AS m ON f.MPA_id = m.id WHERE f.film_id = ?";
 
     private static final String LIKE_QUERY = "INSERT INTO likes(film_id, user_id) VALUES(?, ?)";
 
