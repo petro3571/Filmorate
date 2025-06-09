@@ -46,7 +46,6 @@ class FilmorateDbApplicationTests {
         testUser.setLogin("testLogin");
         testUser.setName("Test Name");
         testUser.setBirthday(LocalDate.of(1990, 1, 1));
-
         User createdUser = userDbStorage.saveUser(testUser);
 
         Optional<User> getUser = userDbStorage.getUser(createdUser.getId());
