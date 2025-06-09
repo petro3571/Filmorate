@@ -14,6 +14,7 @@ import ru.yandex.practicum.filmorate.dal.mapper.GenreRowMapper;
 import ru.yandex.practicum.filmorate.dal.mapper.MpaRowMapper;
 import ru.yandex.practicum.filmorate.dal.mapper.UserRowMapper;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
@@ -156,10 +157,11 @@ class FilmorateDbApplicationTests {
         assertArrayEquals(filmDbService.getPopularFilms(10, null, null).toArray(),
                 new FilmDto[] {film11, film1, film2, film3, film4, film5, film6, film7, film9, film8});
         assertArrayEquals(filmDbService.getPopularFilms(10, 1, null).toArray(),
-                new FilmDto[] {film11,film1, film3, film6, film8});
+                new FilmDto[] {film11, film1, film3, film6, film8});
         assertArrayEquals(filmDbService.getPopularFilms(10, null, 2022).toArray(),
                 new FilmDto[] {film2, film6, film10});
         assertArrayEquals(filmDbService.getPopularFilms(10, 1, 2023).toArray(),
                 new FilmDto[] {film11,film1, film3});
+        assertThrows(NotFoundException.class, () -> filmDbService.getPopularFilms(10, 10, 2022));
     }
 }

@@ -43,26 +43,26 @@ public class FilmDbStorage implements FilmStorage {
 
     private static final String POPULAR_QUERY = "SELECT f.*, m.name AS mpa_name, COUNT(l.user_id) AS likes_count " +
             "FROM films f LEFT JOIN likes l ON f.film_id = l.film_id JOIN mpa m ON f.mpa_id = m.id " +
-            "GROUP BY f.film_id ORDER BY likes_count DESC LIMIT ?";
+            "GROUP BY f.film_id ORDER BY likes_count DESC, f.film_id  LIMIT ?";
 
     private static final String POPULAR_QUERY_BY_YEAR = "SELECT f.*, m.name AS mpa_name, COUNT(l.user_id) AS likes_count " +
             "FROM films f LEFT JOIN likes l ON f.film_id = l.film_id JOIN mpa m ON f.mpa_id = m.id " +
             "WHERE extract(YEAR from CAST(release_date AS date)) = ?" +
-            "GROUP BY f.film_id ORDER BY likes_count DESC LIMIT ?";
+            "GROUP BY f.film_id ORDER BY likes_count DESC, film_id LIMIT ?";
 
     private static final String POPULAR_QUERY_BY_GENRE = "SELECT f.*, m.name AS mpa_name," +
             " COUNT(l.user_id) AS likes_count FROM films f " +
             "LEFT JOIN likes l ON f.film_id = l.film_id JOIN mpa m ON f.mpa_id = m.id " +
             "LEFT JOIN film_genre fg on f.film_id = fg.film_id " +
             "WHERE fg.genre_id = ?" +
-            "GROUP BY f.film_id ORDER BY likes_count DESC LIMIT ?";
+            "GROUP BY f.film_id ORDER BY likes_count DESC, f.film_id LIMIT ?";
 
     private static final String POPULAR_QUERY_BY_GENRE_AND_YEAR = "SELECT f.*, m.name AS mpa_name," +
             " COUNT(l.user_id) AS likes_count FROM films f " +
             "LEFT JOIN likes l ON f.film_id = l.film_id JOIN mpa m ON f.mpa_id = m.id " +
             "LEFT JOIN film_genre fg on f.film_id = fg.film_id " +
             "WHERE fg.genre_id = ? AND EXTRACT(YEAR from CAST(release_date AS date)) = ?" +
-            "GROUP BY f.film_id ORDER BY likes_count DESC LIMIT ?";
+            "GROUP BY f.film_id ORDER BY likes_count DESC, f.film_id LIMIT ?";
 
     private final JdbcTemplate jdbc;
     private final FilmRowMapper mapper;
