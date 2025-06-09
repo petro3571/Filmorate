@@ -93,6 +93,7 @@ class FilmorateDbApplicationTests {
         testFilm.setReleaseDate(LocalDate.of(2000, 1, 1));
         testFilm.setDuration(120);
         testFilm.setMpa(new Mpa(1, null));
+        testFilm.setDirector("Test Director");
 
         User createdUser = userDbStorage.saveUser(testUser);
 
@@ -120,6 +121,7 @@ class FilmorateDbApplicationTests {
         testFilm2.setReleaseDate(LocalDate.of(2001, 1, 1));
         testFilm2.setDuration(150);
         testFilm2.setMpa(new Mpa(2, null));
+        testFilm2.setDirector("Test Director2");
 
 
         Film newCreatedFilm = filmDbStorage.create(testFilm2);
