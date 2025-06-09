@@ -33,4 +33,6 @@ public class FilmDto {
     private Mpa mpa;
 
     private Set<Genre> genres;
+
+    private String director;
 }

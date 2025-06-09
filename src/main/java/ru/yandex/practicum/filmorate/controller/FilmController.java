@@ -30,6 +30,13 @@ public class FilmController {
         return filmService.getFilm(filmId);
     }
 
+    @GetMapping("/search")
+    public Collection<FilmDto> searchFilms(
+            @RequestParam String query,
+            @RequestParam(defaultValue = "title,director") String by) {
+        return filmService.searchFilms(query, by);
+    }
+
     @PostMapping
     public FilmDto create(@Valid @RequestBody NewFilmRequest film) {
         return filmService.create(film);

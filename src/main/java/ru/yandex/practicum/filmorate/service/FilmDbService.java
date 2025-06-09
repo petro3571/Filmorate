@@ -41,14 +41,14 @@ public class FilmDbService {
 
         films.forEach(film -> film.setGenres(genresForFilms.getOrDefault(film.getId(), new HashSet<>())));
 
-       return films
+        return films
                 .stream()
                 .map(FilmMapper::mapToFilmDto)
                 .collect(Collectors.toList());
     }
 
     public FilmDto getFilm(Long filmId) {
-        FilmDto filmDto =  filmDbStorage.getFilm(filmId).map(FilmMapper::mapToFilmDto).orElseThrow(() -> new NotFoundException("Фильм с ID " +
+        FilmDto filmDto = filmDbStorage.getFilm(filmId).map(FilmMapper::mapToFilmDto).orElseThrow(() -> new NotFoundException("Фильм с ID " +
                 filmId + " не найден."));
 
         filmDto.setGenres(genreDbStorage.getFilmGenres(filmId));
@@ -137,5 +137,21 @@ public class FilmDbService {
         popularfilms.forEach(film -> film.setGenres(genresForFilms.getOrDefault(film.getId(), new HashSet<>())));
 
         return popularfilms;
+    }
+
+    public Collection<FilmDto> searchFilms(String query, String searchBy) {
+        Collection<Film> films = filmDbStorage.searchFilms(query, searchBy);
+
+        if (films.isEmpty()) {
+            throw new NotFoundException("Фильмы не найдены.");
+        }
+
+        List<Long> listFilmIds = films.stream().map(Film::getId).collect(Collectors.toList());
+        Map<Long, Set<Genre>> genresForFilms = genreDbStorage.getGenresForFilms(listFilmIds);
+        films.forEach(film -> film.setGenres(genresForFilms.getOrDefault(film.getId(), new HashSet<>())));
+
+        return films.stream()
+                .map(FilmMapper::mapToFilmDto)
+                .collect(Collectors.toList());
     }
 }

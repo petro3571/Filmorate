@@ -33,7 +33,7 @@ public class FilmDbStorage implements FilmStorage {
     private static final String DELETE_QUERY = "DELETE FROM films WHERE film_id = ?";
 
     private static final String NEWFIND = "SELECT f.film_id, f.title, f.description, f.release_date, f.duration, " +
-        "f.mpa_id, m.name FROM films AS f left JOIN mpa AS m ON f.MPA_id = m.id WHERE f.film_id = ?";
+            "f.mpa_id, m.name FROM films AS f left JOIN mpa AS m ON f.MPA_id = m.id WHERE f.film_id = ?";
 
     private static final String LIKE_QUERY = "INSERT INTO likes(film_id, user_id) VALUES(?, ?)";
 
@@ -42,6 +42,11 @@ public class FilmDbStorage implements FilmStorage {
     private static final String POPULAR_QUERY = "SELECT f.*, m.name AS mpa_name, COUNT(l.user_id) AS likes_count " +
             "FROM films f LEFT JOIN likes l ON f.film_id = l.film_id JOIN mpa m ON f.mpa_id = m.id " +
             "GROUP BY f.film_id ORDER BY likes_count DESC LIMIT ?";
+
+    private static final String SEARCH_QUERY = "SELECT f.*.*, m.name AS mpa_name FROM films f " +
+            "LEFT JOIN mpa m ON f.mpa_id = m.id " +
+            "WHERE LOWER(f.title) LIKE LOWER(?) OR LOWER(f.director) LIKE LOWER(?) " +
+            "ORDER BY (SELECT COUNT(*) FROM likes l WHERE l.film_id = f.film_id) DESC";
 
     private final JdbcTemplate jdbc;
     private final FilmRowMapper mapper;
@@ -122,7 +127,8 @@ public class FilmDbStorage implements FilmStorage {
             for (int idx = 0; idx < params.length; idx++) {
                 ps.setObject(idx + 1, params[idx]);
             }
-            return ps; }, keyHolder);
+            return ps;
+        }, keyHolder);
 
         Long id = keyHolder.getKeyAs(Long.class);
 
@@ -178,5 +184,25 @@ public class FilmDbStorage implements FilmStorage {
                 .collect(Collectors.toList());
 
         jdbc.batchUpdate(sql, batchArgs);
+    }
+
+    public Collection<Film> searchFilms(String query, String searchBy) {
+        String searchParam = "%" + query.toLowerCase() + "%";
+
+        if (searchBy.equals("title")) {
+            return jdbc.query("SELECT f.*, m.name AS mpa_name FROM films f " +
+                            "LEFT JOIN mpa m ON f.mpa_id = m.id " +
+                            "WHERE LOWER(f.title) LIKE ? " +
+                            "ORDER BY (SELECT COUNT(*) FROM likes l WHERE l.film_id = f.film_id) DESC",
+                    mapper, searchParam);
+        } else if (searchBy.equals("director")) {
+            return jdbc.query("SELECT f.*, m.name AS mpa_name FROM films f " +
+                            "LEFT JOIN mpa m ON f.mpa_id = m.id " +
+                            "WHERE LOWER(f.director) LIKE ? " +
+                            "ORDER BY (SELECT COUNT(*) FROM likes l WHERE l.film_id = f.film_id) DESC",
+                    mapper, searchParam);
+        } else {
+            return jdbc.query(SEARCH_QUERY, mapper, searchParam, searchParam);
+        }
     }
 }
