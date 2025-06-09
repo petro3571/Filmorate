@@ -152,13 +152,14 @@ class FilmorateDbApplicationTests {
         FilmDto film8 = filmDbService.getFilm(8L);
         FilmDto film9 = filmDbService.getFilm(9L);
         FilmDto film10 = filmDbService.getFilm(10L);
+        FilmDto film11 = filmDbService.getFilm(11L);
         assertArrayEquals(filmDbService.getPopularFilms(10, null, null).toArray(),
-                new FilmDto[] {film1, film2, film3, film4, film5, film6, film7, film9, film8, film10});
+                new FilmDto[] {film11, film1, film2, film3, film4, film5, film6, film7, film9, film8});
         assertArrayEquals(filmDbService.getPopularFilms(10, 1, null).toArray(),
-                new FilmDto[] {film1, film3, film6, film8});
+                new FilmDto[] {film11,film1, film3, film6, film8});
         assertArrayEquals(filmDbService.getPopularFilms(10, null, 2022).toArray(),
                 new FilmDto[] {film2, film6, film10});
         assertArrayEquals(filmDbService.getPopularFilms(10, 1, 2023).toArray(),
-                new FilmDto[] {film1, film3});
+                new FilmDto[] {film11,film1, film3});
     }
 }
