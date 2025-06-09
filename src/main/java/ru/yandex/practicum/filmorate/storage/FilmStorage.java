@@ -22,4 +22,10 @@ public interface FilmStorage {
     void deleteLike(Long filmId, Long userId);
 
     Collection<Film> getPopularFilms(Integer count);
+
+    Collection<Film> getPopularFilmsByYear(Integer count, Integer year);
+
+    Collection<Film> getPopularFilmsByGenre(Integer count, Integer genre);
+
+    Collection<Film> getPopularFilmsByGenreAndYear(Integer count, Integer genre, Integer year);
 }

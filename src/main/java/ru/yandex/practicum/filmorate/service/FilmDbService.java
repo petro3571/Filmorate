@@ -41,14 +41,14 @@ public class FilmDbService {
 
         films.forEach(film -> film.setGenres(genresForFilms.getOrDefault(film.getId(), new HashSet<>())));
 
-       return films
+        return films
                 .stream()
                 .map(FilmMapper::mapToFilmDto)
                 .collect(Collectors.toList());
     }
 
     public FilmDto getFilm(Long filmId) {
-        FilmDto filmDto =  filmDbStorage.getFilm(filmId).map(FilmMapper::mapToFilmDto).orElseThrow(() -> new NotFoundException("Фильм с ID " +
+        FilmDto filmDto = filmDbStorage.getFilm(filmId).map(FilmMapper::mapToFilmDto).orElseThrow(() -> new NotFoundException("Фильм с ID " +
                 filmId + " не найден."));
 
         filmDto.setGenres(genreDbStorage.getFilmGenres(filmId));
@@ -123,8 +123,17 @@ public class FilmDbService {
 
     }
 
-    public Collection<Film> getPopularFilms(Integer count) {
-        Collection<Film> popularfilms = filmDbStorage.getPopularFilms(count);
+    public Collection<FilmDto> getPopularFilms(Integer count, Integer genreId, Integer year) {
+        Collection<Film> popularfilms;
+        if (genreId != null && year != null) {
+            popularfilms = filmDbStorage.getPopularFilmsByGenreAndYear(count, genreId, year);
+        } else if (genreId != null) {
+            popularfilms = filmDbStorage.getPopularFilmsByGenre(count, genreId);
+        } else if (year != null) {
+            popularfilms = filmDbStorage.getPopularFilmsByYear(count, year);
+        } else {
+            popularfilms = filmDbStorage.getPopularFilms(count);
+        }
 
         if (popularfilms.isEmpty()) {
             throw new NotFoundException("Фильмы не найдены.");
@@ -136,6 +145,6 @@ public class FilmDbService {
 
         popularfilms.forEach(film -> film.setGenres(genresForFilms.getOrDefault(film.getId(), new HashSet<>())));
 
-        return popularfilms;
+        return popularfilms.stream().map(FilmMapper::mapToFilmDto).collect(Collectors.toList());
     }
 }

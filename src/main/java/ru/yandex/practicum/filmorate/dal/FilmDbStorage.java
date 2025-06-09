@@ -14,7 +14,9 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Repository
@@ -33,7 +35,7 @@ public class FilmDbStorage implements FilmStorage {
     private static final String DELETE_QUERY = "DELETE FROM films WHERE film_id = ?";
 
     private static final String NEWFIND = "SELECT f.film_id, f.title, f.description, f.release_date, f.duration, " +
-        "f.mpa_id, m.name FROM films AS f left JOIN mpa AS m ON f.MPA_id = m.id WHERE f.film_id = ?";
+            "f.mpa_id, m.name FROM films AS f left JOIN mpa AS m ON f.MPA_id = m.id WHERE f.film_id = ?";
 
     private static final String LIKE_QUERY = "INSERT INTO likes(film_id, user_id) VALUES(?, ?)";
 
@@ -41,6 +43,25 @@ public class FilmDbStorage implements FilmStorage {
 
     private static final String POPULAR_QUERY = "SELECT f.*, m.name AS mpa_name, COUNT(l.user_id) AS likes_count " +
             "FROM films f LEFT JOIN likes l ON f.film_id = l.film_id JOIN mpa m ON f.mpa_id = m.id " +
+            "GROUP BY f.film_id ORDER BY likes_count DESC LIMIT ?";
+
+    private static final String POPULAR_QUERY_BY_YEAR = "SELECT f.*, m.name AS mpa_name, COUNT(l.user_id) AS likes_count " +
+            "FROM films f LEFT JOIN likes l ON f.film_id = l.film_id JOIN mpa m ON f.mpa_id = m.id " +
+            "WHERE extract(YEAR from CAST(release_date AS date)) = ?" +
+            "GROUP BY f.film_id ORDER BY likes_count DESC LIMIT ?";
+
+    private static final String POPULAR_QUERY_BY_GENRE = "SELECT f.*, m.name AS mpa_name," +
+            " COUNT(l.user_id) AS likes_count FROM films f " +
+            "LEFT JOIN likes l ON f.film_id = l.film_id JOIN mpa m ON f.mpa_id = m.id " +
+            "LEFT JOIN film_genre fg on f.film_id = fg.film_id " +
+            "WHERE fg.genre_id = ?" +
+            "GROUP BY f.film_id ORDER BY likes_count DESC LIMIT ?";
+
+    private static final String POPULAR_QUERY_BY_GENRE_AND_YEAR = "SELECT f.*, m.name AS mpa_name," +
+            " COUNT(l.user_id) AS likes_count FROM films f " +
+            "LEFT JOIN likes l ON f.film_id = l.film_id JOIN mpa m ON f.mpa_id = m.id " +
+            "LEFT JOIN film_genre fg on f.film_id = fg.film_id " +
+            "WHERE fg.genre_id = ? AND EXTRACT(YEAR from CAST(release_date AS date)) = ?" +
             "GROUP BY f.film_id ORDER BY likes_count DESC LIMIT ?";
 
     private final JdbcTemplate jdbc;
@@ -114,6 +135,21 @@ public class FilmDbStorage implements FilmStorage {
         return jdbc.query(POPULAR_QUERY, mapper, count);
     }
 
+    @Override
+    public Collection<Film> getPopularFilmsByYear(Integer count, Integer year) {
+        return jdbc.query(POPULAR_QUERY_BY_YEAR, mapper, year, count);
+    }
+
+    @Override
+    public Collection<Film> getPopularFilmsByGenre(Integer count, Integer genre) {
+        return jdbc.query(POPULAR_QUERY_BY_GENRE, mapper, genre, count);
+    }
+
+    @Override
+    public Collection<Film> getPopularFilmsByGenreAndYear(Integer count, Integer genre, Integer year) {
+        return jdbc.query(POPULAR_QUERY_BY_GENRE_AND_YEAR, mapper, genre, year, count);
+    }
+
     private long insert(String query, Object... params) {
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(connection -> {
@@ -122,7 +158,8 @@ public class FilmDbStorage implements FilmStorage {
             for (int idx = 0; idx < params.length; idx++) {
                 ps.setObject(idx + 1, params[idx]);
             }
-            return ps; }, keyHolder);
+            return ps;
+        }, keyHolder);
 
         Long id = keyHolder.getKeyAs(Long.class);
 
