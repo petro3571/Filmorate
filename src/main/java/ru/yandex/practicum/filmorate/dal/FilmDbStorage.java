@@ -28,7 +28,7 @@ public class FilmDbStorage implements FilmStorage {
             "f.duration, f.mpa_id, m.name, f.director FROM films AS f left JOIN mpa AS m ON f.MPA_id = m.id";
 
     private static final String UPDATE_QUERY = "UPDATE films SET title = ?, description = ?, release_date = ?, " +
-            "duration = ?, mpa_id = ?, director = ? WHERE WHERE film_id = ?";
+            "duration = ?, mpa_id = ?, director = ? WHERE film_id = ?";
 
     private static final String DELETE_QUERY = "DELETE FROM films WHERE film_id = ?";
 
@@ -64,7 +64,8 @@ public class FilmDbStorage implements FilmStorage {
                 film.getDescription(),
                 film.getReleaseDate(),
                 film.getDuration(),
-                film.getMpa().getId()
+                film.getMpa().getId(),
+                film.getDirector()
         );
         film.setId(id);
         saveGenres(film);
@@ -80,6 +81,7 @@ public class FilmDbStorage implements FilmStorage {
                 film.getReleaseDate(),
                 film.getDuration(),
                 film.getMpa().getId(),
+                film.getDirector(),
                 film.getId()
         );
 
