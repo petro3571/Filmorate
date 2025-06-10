@@ -14,6 +14,7 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -59,6 +60,26 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User saveUser(User user) {
+        // Валидация email
+        if (user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
+            throw new InternalServerException("Email должен содержать символ @ и не может быть пустым");
+        }
+
+        // Валидация логина
+        if (user.getLogin() == null || user.getLogin().isBlank() || user.getLogin().contains(" ")) {
+            throw new InternalServerException("Логин не может быть пустым или содержать пробелы");
+        }
+
+        // Валидация даты рождения
+        if (user.getBirthday().isAfter(LocalDate.now())) {
+            throw new InternalServerException("Дата рождения не может быть в будущем");
+        }
+
+        // Установка имени, если оно пустое
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
+
         long id = insert(
                 INSERT_QUERY,
                 user.getName(),
@@ -72,6 +93,21 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User updateUser(User user) {
+        // Валидация email
+        if (user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
+            throw new InternalServerException("Email должен содержать символ @ и не может быть пустым");
+        }
+
+        // Валидация логина
+        if (user.getLogin() == null || user.getLogin().isBlank() || user.getLogin().contains(" ")) {
+            throw new InternalServerException("Логин не может быть пустым или содержать пробелы");
+        }
+
+        // Валидация даты рождения
+        if (user.getBirthday().isAfter(LocalDate.now())) {
+            throw new InternalServerException("Дата рождения не может быть в будущем");
+        }
+
         update(
                 UPDATE_QUERY,
                 user.getName(),
@@ -117,6 +153,14 @@ public class UserDbStorage implements UserStorage {
     public void deleteFriend(Long userId, Long friendId) {
         existsUserById(userId);
         existsUserById(friendId);
+
+        // Проверяем, существует ли такая дружба
+        String checkFriendshipSql = "SELECT COUNT(*) FROM friends WHERE user_id = ? AND friend_id = ?";
+        Integer count = jdbc.queryForObject(checkFriendshipSql, Integer.class, userId, friendId);
+        if (count == 0) {
+            throw new InternalServerException("Пользователи с ID " + userId + " и " + friendId + " не являются друзьями");
+        }
+
         String query = "DELETE FROM friends WHERE user_id = ? AND friend_id = ?";
         jdbc.update(query, userId, friendId);
     }
@@ -154,7 +198,8 @@ public class UserDbStorage implements UserStorage {
             for (int idx = 0; idx < params.length; idx++) {
                 ps.setObject(idx + 1, params[idx]);
             }
-            return ps; }, keyHolder);
+            return ps;
+        }, keyHolder);
 
         Long id = keyHolder.getKeyAs(Long.class);
 

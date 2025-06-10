@@ -6,6 +6,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.dal.mapper.MpaRowMapper;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.MpaStorage;
 
@@ -32,7 +33,7 @@ public class MpaDbStorage implements MpaStorage {
             Mpa mpa = jdbc.queryForObject(FIND_BY_ID_QUERY, mapper, mpaId);
             return Optional.ofNullable(mpa);
         } catch (EmptyResultDataAccessException e) {
-            return Optional.empty();
+            throw new NotFoundException("MPA с id=" + mpaId + " не найден");
         }
     }
 }
