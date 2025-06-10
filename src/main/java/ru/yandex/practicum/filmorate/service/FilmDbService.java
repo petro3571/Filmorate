@@ -136,7 +136,7 @@ public class FilmDbService {
         }
 
         if (popularfilms.isEmpty()) {
-            throw new NotFoundException("Фильмы не найдены.");
+            return new ArrayList<>();
         }
 
         List<Long> listFilmIds = popularfilms.stream().map(Film::getId).collect(Collectors.toList());
