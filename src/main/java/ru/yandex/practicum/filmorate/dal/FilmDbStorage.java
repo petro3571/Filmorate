@@ -43,6 +43,11 @@ public class FilmDbStorage implements FilmStorage {
             "FROM films f LEFT JOIN likes l ON f.film_id = l.film_id JOIN mpa m ON f.mpa_id = m.id " +
             "GROUP BY f.film_id ORDER BY likes_count DESC LIMIT ?";
 
+    private static final String RECOMENDATION_QUERY = "SELECT f.*, m.name AS mpa_name from films f JOIN mpa m ON " +
+            "f.mpa_id = m.id where f.film_id in (select film_id from likes where user_id in (select user_id from likes" +
+            " where film_id in (select film_id from likes where user_id = ?) and user_id not in (?) group by user_id " +
+            "limit 1)) and f.film_id not in (select film_id from likes where user_id = ?)";
+
     private final JdbcTemplate jdbc;
     private final FilmRowMapper mapper;
 
@@ -178,5 +183,10 @@ public class FilmDbStorage implements FilmStorage {
                 .collect(Collectors.toList());
 
         jdbc.batchUpdate(sql, batchArgs);
+    }
+
+    @Override
+    public Collection<Film> getRecommendations(Long userId) {
+        return jdbc.query(RECOMENDATION_QUERY, mapper, userId, userId, userId);
     }
 }

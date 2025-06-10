@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dal.UserDbStorage;
@@ -9,21 +10,23 @@ import ru.yandex.practicum.filmorate.dto.UserDto;
 import ru.yandex.practicum.filmorate.exception.DataAlreadyExistException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.mapper.UserMapper;
+import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserDBService {
     private final UserStorage userDbStorage;
-
-    public UserDBService(UserDbStorage userDbStorage) {
-        this.userDbStorage = userDbStorage;
-    }
+    private final FilmStorage filmDbStorage;
+    private final GenreStorage genreDbStorage;
 
     public List<UserDto> getUsers() {
         return userDbStorage.getAll()
@@ -91,5 +94,22 @@ public class UserDBService {
 
     public void confirmFriend(Long userId, Long friendId) {
         userDbStorage.confirmFriend(userId, friendId);
+    }
+
+    public Collection<Film> getRecommendations(Long userId) {
+        userDbStorage.existsUserById(userId);
+        Collection<Film> recFilms = filmDbStorage.getRecommendations(userId);
+
+        if (recFilms.isEmpty()) {
+            throw new NotFoundException("Реккомендованные фильмы не найдены.");
+        }
+
+        List<Long> listFilmIds = recFilms.stream().map(Film::getId).collect(Collectors.toList());
+
+        Map<Long, Set<Genre>> genresForFilms = genreDbStorage.getGenresForFilms(listFilmIds);
+
+        recFilms.forEach(film -> film.setGenres(genresForFilms.getOrDefault(film.getId(), new HashSet<>())));
+
+        return recFilms;
     }
 }
