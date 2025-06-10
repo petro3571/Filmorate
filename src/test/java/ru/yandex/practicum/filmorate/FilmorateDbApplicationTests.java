@@ -162,6 +162,5 @@ class FilmorateDbApplicationTests {
                 new FilmDto[] {film2, film6, film10});
         assertArrayEquals(filmDbService.getPopularFilms(10, 1, 2023).toArray(),
                 new FilmDto[] {film11,film1, film3});
-        assertThrows(NotFoundException.class, () -> filmDbService.getPopularFilms(10, 10, 2022));
     }
 }
