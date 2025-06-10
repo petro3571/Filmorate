@@ -43,10 +43,10 @@ public class FilmDbStorage implements FilmStorage {
             "FROM films f LEFT JOIN likes l ON f.film_id = l.film_id JOIN mpa m ON f.mpa_id = m.id " +
             "GROUP BY f.film_id ORDER BY likes_count DESC LIMIT ?";
 
-    private static final String RECOMENDATION_QUERY = "SELECT f.*, m.name AS mpa_name from films f JOIN mpa m ON " +
-            "f.mpa_id = m.id where f.film_id in (select film_id from likes where user_id in (select user_id from likes" +
-            " where film_id in (select film_id from likes where user_id = ?) and user_id not in (?) group by user_id " +
-            "limit 1)) and f.film_id not in (select film_id from likes where user_id = ?)";
+    private static final String RECOMMENDATION_QUERY = "SELECT f.*, m.name AS mpa_name FROM films f JOIN mpa m ON " +
+            "f.mpa_id = m.id WHERE f.film_id in (SELECT film_id FROM likes WHERE user_id in (SELECT user_id FROM likes" +
+            " WHERE film_id in (SELECT film_id FROM likes WHERE user_id = ?) and user_id not in (?) GROUP BY user_id " +
+            "limit 1)) and f.film_id not in (SELECT film_id FROM likes WHERE user_id = ?)";
 
     private final JdbcTemplate jdbc;
     private final FilmRowMapper mapper;
@@ -187,6 +187,6 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Collection<Film> getRecommendations(Long userId) {
-        return jdbc.query(RECOMENDATION_QUERY, mapper, userId, userId, userId);
+        return jdbc.query(RECOMMENDATION_QUERY, mapper, userId, userId, userId);
     }
 }

@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.dal.UserDbStorage;
 import ru.yandex.practicum.filmorate.dto.NewUserRequest;
 import ru.yandex.practicum.filmorate.dto.UpdateUserRequest;
 import ru.yandex.practicum.filmorate.dto.UserDto;
@@ -101,7 +100,7 @@ public class UserDBService {
         Collection<Film> recFilms = filmDbStorage.getRecommendations(userId);
 
         if (recFilms.isEmpty()) {
-            throw new NotFoundException("Реккомендованные фильмы не найдены.");
+            throw new NotFoundException("Рекомендованные фильмы не найдены.");
         }
 
         List<Long> listFilmIds = recFilms.stream().map(Film::getId).collect(Collectors.toList());
