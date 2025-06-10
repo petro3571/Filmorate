@@ -100,7 +100,7 @@ public class UserDBService {
         Collection<Film> recFilms = filmDbStorage.getRecommendations(userId);
 
         if (recFilms.isEmpty()) {
-            throw new NotFoundException("Рекомендованные фильмы не найдены.");
+            return new ArrayList<>();
         }
 
         List<Long> listFilmIds = recFilms.stream().map(Film::getId).collect(Collectors.toList());
