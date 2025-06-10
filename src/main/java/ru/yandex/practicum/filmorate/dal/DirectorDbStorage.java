@@ -13,8 +13,8 @@ import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
-import java.util.Collection;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
@@ -24,9 +24,18 @@ public class DirectorDbStorage implements DirectorStorage {
     private static final String FIND_BY_ID_QUERY = "SELECT * FROM directors WHERE director_id = ?";
     private static final String UPDATE_QUERY = "UPDATE directors SET name = ? WHERE director_id = ?";
     private static final String DELETE_QUERY = "DELETE FROM directors WHERE director_id = ?";
+    private static final String FIND_FILM_DIRECTORS = "SELECT d.director_id, d.name " +
+            "FROM film_director fd " +
+            "JOIN directors d ON fd.director_id = d.director_id " +
+            "WHERE fd.film_id = ?";
+    private static final String FIND_DIRECTORS_FOR_FILMS = "SELECT fd.film_id, d.director_id, d.name " +
+            "FROM film_director fd " +
+            "JOIN directors d ON fd.director_id = d.director_id " +
+            "WHERE fd.film_id IN (%s)";
 
     private final JdbcTemplate jdbcTemplate;
     private final DirectorRowMapper directorRowMapper;
+
 
     @Override
     public Collection<Director> getAll() {
@@ -76,6 +85,46 @@ public class DirectorDbStorage implements DirectorStorage {
 
         if (deletedRows == 0) {
             throw new NotFoundException("Режиссер с ID " + id + " не найден.");
+        }
+    }
+
+    @Override
+    public Set<Director> getFilmDirectors(Long filmId) {
+        return new HashSet<>(jdbcTemplate.query(FIND_FILM_DIRECTORS, directorRowMapper, filmId));
+    }
+
+    @Override
+    public Map<Long, Set<Director>> getDirectorsForFilms(Collection<Long> filmIds) {
+        if (filmIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        String inClause = String.join(",", Collections.nCopies(filmIds.size(), "?"));
+        String sql = String.format(FIND_DIRECTORS_FOR_FILMS, inClause);
+
+        return jdbcTemplate.query(sql, filmIds.toArray(), rs -> {
+            Map<Long, Set<Director>> result = new HashMap<>();
+            while (rs.next()) {
+                Long filmId = rs.getLong("film_id");
+                Director director = new Director();
+                director.setId(rs.getLong("director_id"));
+                director.setName(rs.getString("name"));
+                result.computeIfAbsent(filmId, k -> new HashSet<>()).add(director);
+            }
+            return result;
+        });
+    }
+
+    @Override
+    public void updateFilmDirectors(Long filmId, Set<Director> directors) {
+        jdbcTemplate.update("DELETE FROM film_director WHERE film_id = ?", filmId);
+
+        if (directors != null && !directors.isEmpty()) {
+            List<Object[]> batchArgs = directors.stream()
+                    .map(director -> new Object[]{filmId, director.getId()})
+                    .collect(Collectors.toList());
+
+            jdbcTemplate.batchUpdate("INSERT INTO film_director (film_id, director_id) VALUES (?, ?)", batchArgs);
         }
     }
 }

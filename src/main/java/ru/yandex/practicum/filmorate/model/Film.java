@@ -6,6 +6,7 @@ import jakarta.validation.constraints.*;
 import ru.yandex.practicum.filmorate.annotation.RealeaseDateMin;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -33,6 +34,5 @@ public class Film {
 
     private Set<Genre> genres;
 
-    private String director;
-
+    private Set<Director> directors = new HashSet<>();
 }

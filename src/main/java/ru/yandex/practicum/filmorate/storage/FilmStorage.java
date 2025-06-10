@@ -1,9 +1,11 @@
 package ru.yandex.practicum.filmorate.storage;
 
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.Set;
 
 public interface FilmStorage {
 
@@ -24,4 +26,12 @@ public interface FilmStorage {
     Collection<Film> getPopularFilms(Integer count);
 
     Collection<Film> searchFilms(String query, String searchBy);
+
+    Set<Director> getFilmDirectors(Long filmId);
+
+    Collection<Film> searchByTitle(String query);
+
+    Collection<Film> searchByDirector(String query);
+
+    Collection<Film> searchByTitleAndDirector(String query);
 }

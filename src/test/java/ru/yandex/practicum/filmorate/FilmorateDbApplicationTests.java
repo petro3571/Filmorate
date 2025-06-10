@@ -1,44 +1,61 @@
 package ru.yandex.practicum.filmorate;
 
 import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import ru.yandex.practicum.filmorate.dal.DirectorDbStorage;
 import ru.yandex.practicum.filmorate.dal.GenreDbStorage;
 import ru.yandex.practicum.filmorate.dal.MpaDbStorage;
-import ru.yandex.practicum.filmorate.dal.mapper.FilmRowMapper;
-import ru.yandex.practicum.filmorate.dal.mapper.GenreRowMapper;
-import ru.yandex.practicum.filmorate.dal.mapper.MpaRowMapper;
-import ru.yandex.practicum.filmorate.dal.mapper.UserRowMapper;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.dal.mapper.*;
+import ru.yandex.practicum.filmorate.mapper.DirectorRowMapper;
+import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.dal.FilmDbStorage;
 import ru.yandex.practicum.filmorate.dal.UserDbStorage;
+import ru.yandex.practicum.filmorate.service.DirectorService;
+import ru.yandex.practicum.filmorate.service.DirectorServiceImpl;
 
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@JdbcTest
+@SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-@Import({UserDbStorage.class, FilmDbStorage.class, GenreDbStorage.class, MpaDbStorage.class, UserRowMapper.class, FilmRowMapper.class, GenreRowMapper.class, MpaRowMapper.class})
+@Import({
+        UserDbStorage.class,
+        FilmDbStorage.class,
+        GenreDbStorage.class,
+        MpaDbStorage.class,
+        DirectorDbStorage.class,
+        DirectorServiceImpl.class,
+        UserRowMapper.class,
+        FilmRowMapper.class,
+        GenreRowMapper.class,
+        MpaRowMapper.class,
+        DirectorRowMapper.class
+})
 class FilmorateDbApplicationTests {
+
     private final UserDbStorage userDbStorage;
     private final FilmDbStorage filmDbStorage;
+    private final DirectorService directorService;
+    private final GenreDbStorage genreDbStorage;
+    private final MpaDbStorage mpaDbStorage;
 
-    private User testUser;
-    private Film testFilm;
+    @BeforeEach
+    void clearDatabase() {
+        filmDbStorage.getAll().forEach(film -> filmDbStorage.deleteFilm(film.getId()));
+        userDbStorage.getAll().forEach(userDbStorage::deleteUser);
+    }
 
     @Test
     void shouldRunWorkWithUsers() {
-        testUser = new User();
+        User testUser = new User();
         testUser.setEmail("test@ya.ru");
         testUser.setLogin("testLogin");
         testUser.setName("Test Name");
@@ -50,7 +67,8 @@ class FilmorateDbApplicationTests {
 
         Collection<User> users = userDbStorage.getAll();
 
-        assertEquals(getUser.get().getName(), "Test Name");
+        assertTrue(getUser.isPresent());
+        assertEquals("Test Name", getUser.get().getName());
 
         assertFalse(users.isEmpty());
 
@@ -58,7 +76,7 @@ class FilmorateDbApplicationTests {
 
         User updateUser = userDbStorage.updateUser(createdUser);
 
-        assertEquals(updateUser.getName(), "New Test Name");
+        assertEquals("New Test Name", updateUser.getName());
 
         User newTestUser = new User();
 
@@ -82,21 +100,25 @@ class FilmorateDbApplicationTests {
 
     @Test
     void shouldRunWorkWithFilms() {
-        testUser = new User();
+        // Создаем тестового режиссера
+        Director director = new Director();
+        director.setName("Test Director");
+        Director createdDirector = directorService.create(director);
+
+        User testUser = new User();
         testUser.setEmail("test@ya.ru");
         testUser.setLogin("testLogin");
         testUser.setName("Test Name");
         testUser.setBirthday(LocalDate.of(1990, 1, 1));
+        User createdUser = userDbStorage.saveUser(testUser);
 
-        testFilm = new Film();
+        Film testFilm = new Film();
         testFilm.setName("Test Film");
         testFilm.setDescription("Test Description");
         testFilm.setReleaseDate(LocalDate.of(2000, 1, 1));
         testFilm.setDuration(120);
         testFilm.setMpa(new Mpa(1, null));
-        testFilm.setDirector("Test Director");
-
-        User createdUser = userDbStorage.saveUser(testUser);
+        testFilm.setDirectors(Set.of(createdDirector));
 
         Film createdFilm = filmDbStorage.create(testFilm);
 
@@ -106,15 +128,22 @@ class FilmorateDbApplicationTests {
 
         assertFalse(films.isEmpty());
 
-        assertEquals(getFilm.get().getName(), "Test Film");
+        assertTrue(getFilm.isPresent());
+        assertEquals("Test Film", getFilm.get().getName());
 
         createdFilm.setName("Test Film Name");
 
         Film updatedFilm = filmDbStorage.update(createdFilm);
 
-        assertEquals(updatedFilm.getName(), "Test Film Name");
+        assertEquals("Test Film Name", updatedFilm.getName());
 
-        assertEquals(films.size(), 1);
+        // Проверяем, что фильмов ровно 1 (т.к. база очищена)
+        assertEquals(1, films.size());
+
+        // Создаем второго режиссера
+        Director director2 = new Director();
+        director2.setName("Test Director 2");
+        Director createdDirector2 = directorService.create(director2);
 
         Film testFilm2 = new Film();
         testFilm2.setName("Test Film2");
@@ -122,8 +151,7 @@ class FilmorateDbApplicationTests {
         testFilm2.setReleaseDate(LocalDate.of(2001, 1, 1));
         testFilm2.setDuration(150);
         testFilm2.setMpa(new Mpa(2, null));
-        testFilm2.setDirector("Test Director2");
-
+        testFilm2.setDirectors(Set.of(createdDirector2));
 
         Film newCreatedFilm = filmDbStorage.create(testFilm2);
 
@@ -131,10 +159,71 @@ class FilmorateDbApplicationTests {
 
         Collection<Film> popularFilm = filmDbStorage.getPopularFilms(1);
 
-        assertEquals(popularFilm.size(), 1);
+        assertEquals(1, popularFilm.size());
 
-        Film newFilm = popularFilm.stream().findFirst().get();
+        Film newFilm = popularFilm.iterator().next();
 
-        assertEquals(newFilm.getName(), "Test Film Name");
+        assertEquals("Test Film Name", newFilm.getName());
+    }
+
+    @Test
+    void shouldSearchFilmsByTitle() {
+        // Создаем режиссера
+        Director director = new Director();
+        director.setName("Director One");
+        Director createdDirector = directorService.create(director);
+
+        Film film1 = createTestFilm("Test Film 1", "Description 1", Set.of(createdDirector));
+        film1.setDirectors(Set.of(createdDirector));
+        filmDbStorage.update(film1);
+
+        Film film2 = createTestFilm("Another Film", "Description 2", Set.of(createdDirector));
+        filmDbStorage.update(film2);
+
+        Collection<Film> results = filmDbStorage.searchByTitle("test");
+        assertEquals(1, results.size());
+        assertTrue(results.stream().anyMatch(f -> f.getName().equals("Test Film 1")));
+    }
+
+    @Test
+    void shouldSearchFilmsByDirector() {
+        Director director = new Director();
+        director.setName("Director One");
+        Director createdDirector = directorService.create(director);
+
+        Film film = createTestFilm("Film 1", "Description 1", Set.of(createdDirector));
+
+        Collection<Film> results = filmDbStorage.searchByDirector("one");
+        assertEquals(1, results.size());
+        Film resultFilm = results.iterator().next();
+        assertTrue(resultFilm.getDirectors().stream()
+                .anyMatch(d -> d.getName().equals("Director One")));
+    }
+
+    @Test
+    void shouldSearchFilmsByTitleAndDirector() {
+        Director director = new Director();
+        director.setName("Director One");
+        Director createdDirector = directorService.create(director);
+
+        Film film1 = createTestFilm("Test Film", "Description 1", Set.of(createdDirector));
+
+        Film film2 = createTestFilm("Another Film", "Description 2", Set.of(createdDirector));
+
+        Collection<Film> results = filmDbStorage.searchByTitleAndDirector("test");
+        assertEquals(1, results.size());
+        assertTrue(results.stream().anyMatch(f -> f.getName().equals("Test Film")));
+    }
+
+    private Film createTestFilm(String name, String description, Set<Director> directors) {
+        Film film = new Film();
+        film.setName(name);
+        film.setDescription(description);
+        film.setReleaseDate(LocalDate.now());
+        film.setDuration(120);
+        film.setMpa(new Mpa(1, "G"));
+        film.setDirectors(directors != null ? directors : new HashSet<>());
+        film.setGenres(new HashSet<>());
+        return filmDbStorage.create(film);
     }
 }

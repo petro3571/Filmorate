@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import ru.yandex.practicum.filmorate.annotation.RealeaseDateMin;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
@@ -16,6 +17,7 @@ import java.util.Set;
 public class NewFilmRequest {
     @NotBlank
     private String name;
+    private Set<Director> directors = new HashSet<>();
 
     @Size(max = 200, message = "Описание не должно превышать 200 символов.")
     private String description;
