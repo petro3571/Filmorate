@@ -43,7 +43,7 @@ public class FilmDbStorage implements FilmStorage {
             "FROM films f LEFT JOIN likes l ON f.film_id = l.film_id JOIN mpa m ON f.mpa_id = m.id " +
             "GROUP BY f.film_id ORDER BY likes_count DESC LIMIT ?";
 
-    private static final String SEARCH_QUERY = "SELECT f.*.*, m.name AS mpa_name FROM films f " +
+    private static final String SEARCH_QUERY = "SELECT f.*, m.name AS mpa_name FROM films f " +
             "LEFT JOIN mpa m ON f.mpa_id = m.id " +
             "WHERE LOWER(f.title) LIKE LOWER(?) OR LOWER(f.director) LIKE LOWER(?) " +
             "ORDER BY (SELECT COUNT(*) FROM likes l WHERE l.film_id = f.film_id) DESC";
