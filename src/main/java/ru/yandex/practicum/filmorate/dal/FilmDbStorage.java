@@ -192,19 +192,27 @@ public class FilmDbStorage implements FilmStorage {
         String searchParam = "%" + query.toLowerCase() + "%";
 
         if (searchBy.equals("title")) {
-            return jdbc.query("SELECT f.*, m.name AS mpa_name FROM films f " +
+            return jdbc.query(
+                    "SELECT f.*, m.name FROM films f " +
                             "LEFT JOIN mpa m ON f.mpa_id = m.id " +
                             "WHERE LOWER(f.title) LIKE ? " +
                             "ORDER BY (SELECT COUNT(*) FROM likes l WHERE l.film_id = f.film_id) DESC",
                     mapper, searchParam);
         } else if (searchBy.equals("director")) {
-            return jdbc.query("SELECT f.*, m.name AS mpa_name FROM films f " +
+            return jdbc.query(
+                    "SELECT f.*, m.name FROM films f " +
                             "LEFT JOIN mpa m ON f.mpa_id = m.id " +
                             "WHERE LOWER(f.director) LIKE ? " +
                             "ORDER BY (SELECT COUNT(*) FROM likes l WHERE l.film_id = f.film_id) DESC",
                     mapper, searchParam);
         } else {
-            return jdbc.query(SEARCH_QUERY, mapper, searchParam, searchParam);
+            return jdbc.query(
+                    "SELECT f.*, m.name FROM films f " +
+                            "LEFT JOIN mpa m ON f.mpa_id = m.id " +
+                            "WHERE LOWER(f.title) LIKE ? OR LOWER(f.director) LIKE ? " +
+                            "ORDER BY (SELECT COUNT(*) FROM likes l WHERE l.film_id = f.film_id) DESC",
+                    mapper, searchParam, searchParam);
         }
+
     }
 }
