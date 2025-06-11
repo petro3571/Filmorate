@@ -6,7 +6,6 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.dal.mapper.UserRowMapper;
 import ru.yandex.practicum.filmorate.exception.InternalServerException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -22,6 +21,7 @@ import java.util.stream.Collectors;
 @Repository
 @RequiredArgsConstructor
 @Qualifier("userDbStorage")
+
 public class UserDbStorage implements UserStorage {
     private static final String INSERT_QUERY = "INSERT INTO users(name, email, login, birthday)" +
             "VALUES (?, ?, ?, ?)";
@@ -31,17 +31,16 @@ public class UserDbStorage implements UserStorage {
 
     private static final String DELETE_QUERY = "DELETE FROM users WHERE user_id = ?";
 
-    private static final String FIND_ALL_QUERY = "SELECT user_id AS id, name AS username, email, login, birthday " +
-            "FROM users";
+    private static final String FIND_ALL_QUERY = "SELECT user_id AS id, name AS username, email, login, birthday FROM users";
 
-    private static final String FIND_BY_ID_QUERY = "SELECT user_id AS id, name AS username, email, login, birthday " +
-            "FROM users WHERE user_id = ?";
+    private static final String FIND_BY_ID_QUERY = "SELECT user_id AS id, name AS username, email, login, birthday FROM users WHERE user_id = ?";
 
-    private static final String FIND_BY_EMAIL_QUERY = "SELECT user_id AS id, name AS username, email, login, birthday " +
-            "FROM users WHERE email = ?";
+    private static final String FIND_BY_EMAIL_QUERY = "SELECT user_id AS id, name AS username, email, login, birthday FROM users WHERE email = ?";
+
 
     private final JdbcTemplate jdbc;
-    private final UserRowMapper mapper;
+    private final ru.yandex.practicum.filmorate.storage.user.UserRowMapper mapper;
+
 
     @Override
     public List<User> getAll() {

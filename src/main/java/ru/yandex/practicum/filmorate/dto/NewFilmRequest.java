@@ -32,5 +32,4 @@ public class NewFilmRequest {
 
     private Set<Genre> genres = new HashSet<>();
 
-    private String director;
 }

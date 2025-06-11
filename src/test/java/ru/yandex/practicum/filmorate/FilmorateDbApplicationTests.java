@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,7 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
+@Transactional
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
@@ -37,8 +38,8 @@ import static org.junit.jupiter.api.Assertions.*;
         MpaDbStorage.class,
         DirectorDbStorage.class,
         DirectorServiceImpl.class,
-        UserRowMapper.class,
-        FilmRowMapper.class,
+        ru.yandex.practicum.filmorate.storage.user.UserRowMapper.class,
+        ru.yandex.practicum.filmorate.storage.film.FilmRowMapper.class,
         GenreRowMapper.class,
         MpaRowMapper.class,
         DirectorRowMapper.class
@@ -193,7 +194,7 @@ class FilmorateDbApplicationTests {
         assertEquals(commonFriend.getId(), commonFriends.get(0).get().getId());
     }
 
-    // Film tests
+    // Тесты по фильмам
     @Test
     void filmCreateSuccess() {
         Film film = createTestFilm("Film", "Description", LocalDate.of(2000, 1, 1), 120, new Mpa(1, "G"));
@@ -336,7 +337,7 @@ class FilmorateDbApplicationTests {
         assertEquals(1, popularFilms.size());
     }
 
-    // MPA tests
+    // MPA тесты
     @Test
     void getMPANameById() {
         Optional<Mpa> mpa = mpaDbStorage.getMpa(1);
@@ -355,7 +356,6 @@ class FilmorateDbApplicationTests {
         assertEquals(5, mpaList.size());
     }
 
-    // Helper methods
     private User createTestUser(String email, String login, String name, LocalDate birthday) {
         User user = new User();
         user.setEmail(email);

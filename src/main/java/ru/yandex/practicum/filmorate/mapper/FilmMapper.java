@@ -17,8 +17,12 @@ public final class FilmMapper {
         film.setDescription(request.getDescription());
         film.setReleaseDate(request.getReleaseDate());
         film.setDuration(request.getDuration());
+        film.setMpa(request.getMpa());
         if (request.getDirectors() != null) {
             film.setDirectors(new HashSet<>(request.getDirectors()));
+        }
+        if (request.getGenres() != null) {
+            film.setGenres(new HashSet<>(request.getGenres()));
         }
         return film;
     }

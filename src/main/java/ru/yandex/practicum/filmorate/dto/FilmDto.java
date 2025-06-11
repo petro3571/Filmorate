@@ -36,6 +36,4 @@ public class FilmDto {
 
     private Set<Genre> genres;
 
-    private Set<Director> director;
-
 }
