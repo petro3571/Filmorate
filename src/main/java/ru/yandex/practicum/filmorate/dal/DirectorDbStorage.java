@@ -73,7 +73,7 @@ public class DirectorDbStorage implements DirectorStorage {
     @Override
     public Set<Director> getFilmDirectors(Long filmId) {
         String sql = "SELECT d.id, d.name FROM film_director fd " +
-                "JOIN directors d ON fd.directirector_id = d.id " +
+                "JOIN directors d ON fd.director_id = d.id " +
                 "WHERE fd.film_id = ?";
         return new HashSet<>(jdbc.query(sql, (rs, rowNum) -> {
             Director director = new Director();
