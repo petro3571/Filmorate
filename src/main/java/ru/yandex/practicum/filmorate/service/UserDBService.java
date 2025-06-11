@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.dto.NewUserRequest;
 import ru.yandex.practicum.filmorate.dto.UpdateUserRequest;
 import ru.yandex.practicum.filmorate.dto.UserDto;
 import ru.yandex.practicum.filmorate.exception.DataAlreadyExistException;
+import ru.yandex.practicum.filmorate.exception.IdValidationException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.mapper.UserMapper;
 import ru.yandex.practicum.filmorate.model.User;
@@ -33,24 +34,35 @@ public class UserDBService {
     }
 
     public UserDto getUserById(Long id) {
-        return userDbStorage.getUser(id).map(UserMapper::mapToUserDto).orElseThrow(() -> new NotFoundException("Пользователь с ID " +
-                id + " не найден."));
+        User user = userDbStorage.getUser(id)
+                .orElseThrow(() -> new NotFoundException("Пользователь с ID " + id + " не найден."));
+        return UserMapper.mapToUserDto(user);
     }
 
     public UserDto createUser(NewUserRequest request) {
-        if (request.getEmail() == null || request.getEmail().isEmpty()) {
-            throw new NotFoundException("Имейл должен быть указан");
+        if (request.getEmail() == null || request.getEmail().isBlank()) {
+            throw new IdValidationException("Email должен быть указан");
+        }
+
+        if (request.getLogin() == null || request.getLogin().isBlank()) {
+            throw new IdValidationException("Login должен быть указан");
+        }
+
+        if (request.getBirthday() == null) {
+            throw new IdValidationException("Дата рождения должна быть указана");
         }
 
         Optional<User> alreadyExistUser = userDbStorage.findByEmail(request.getEmail());
         if (alreadyExistUser.isPresent()) {
-            throw new DataAlreadyExistException("Данный имейл уже используется");
+            throw new DataAlreadyExistException("Данный email уже используется");
         }
 
         User user = UserMapper.mapToUser(request);
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
 
         user = userDbStorage.saveUser(user);
-
         return UserMapper.mapToUserDto(user);
     }
 

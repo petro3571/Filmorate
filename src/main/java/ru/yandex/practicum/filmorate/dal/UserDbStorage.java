@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Qualifier("userDbStorage")
 public class UserDbStorage implements UserStorage {
-    private static final String INSERT_QUERY = "INSERT INTO users(name, email, login, birthday)" +
+    private static final String INSERT_QUERY = "INSERT INTO users(name, email, login, birthday) " +
             "VALUES (?, ?, ?, ?)";
 
     private static final String UPDATE_QUERY = "UPDATE users SET name = ?, email = ?, login = ?, birthday = ? " +
