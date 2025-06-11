@@ -6,6 +6,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.dal.mapper.UserRowMapper;
 import ru.yandex.practicum.filmorate.exception.InternalServerException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -13,7 +14,6 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 @Repository
 @RequiredArgsConstructor
 @Qualifier("userDbStorage")
-
 public class UserDbStorage implements UserStorage {
     private static final String INSERT_QUERY = "INSERT INTO users(name, email, login, birthday)" +
             "VALUES (?, ?, ?, ?)";
@@ -31,16 +30,17 @@ public class UserDbStorage implements UserStorage {
 
     private static final String DELETE_QUERY = "DELETE FROM users WHERE user_id = ?";
 
-    private static final String FIND_ALL_QUERY = "SELECT user_id AS id, name AS username, email, login, birthday FROM users";
+    private static final String FIND_ALL_QUERY = "SELECT user_id AS id, name AS username, email, login, birthday " +
+            "FROM users";
 
-    private static final String FIND_BY_ID_QUERY = "SELECT user_id AS id, name AS username, email, login, birthday FROM users WHERE user_id = ?";
+    private static final String FIND_BY_ID_QUERY = "SELECT user_id AS id, name AS username, email, login, birthday " +
+            "FROM users WHERE user_id = ?";
 
-    private static final String FIND_BY_EMAIL_QUERY = "SELECT user_id AS id, name AS username, email, login, birthday FROM users WHERE email = ?";
-
+    private static final String FIND_BY_EMAIL_QUERY = "SELECT user_id AS id, name AS username, email, login, birthday " +
+            "FROM users WHERE email = ?";
 
     private final JdbcTemplate jdbc;
-    private final ru.yandex.practicum.filmorate.storage.user.UserRowMapper mapper;
-
+    private final UserRowMapper mapper;
 
     @Override
     public List<User> getAll() {
@@ -59,26 +59,6 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User saveUser(User user) {
-        // Валидация email
-        if (user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
-            throw new InternalServerException("Email должен содержать символ @ и не может быть пустым");
-        }
-
-        // Валидация логина
-        if (user.getLogin() == null || user.getLogin().isBlank() || user.getLogin().contains(" ")) {
-            throw new InternalServerException("Логин не может быть пустым или содержать пробелы");
-        }
-
-        // Валидация даты рождения
-        if (user.getBirthday().isAfter(LocalDate.now())) {
-            throw new InternalServerException("Дата рождения не может быть в будущем");
-        }
-
-        // Установка имени, если оно пустое
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
-
         long id = insert(
                 INSERT_QUERY,
                 user.getName(),
@@ -92,21 +72,6 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User updateUser(User user) {
-        // Валидация email
-        if (user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
-            throw new InternalServerException("Email должен содержать символ @ и не может быть пустым");
-        }
-
-        // Валидация логина
-        if (user.getLogin() == null || user.getLogin().isBlank() || user.getLogin().contains(" ")) {
-            throw new InternalServerException("Логин не может быть пустым или содержать пробелы");
-        }
-
-        // Валидация даты рождения
-        if (user.getBirthday().isAfter(LocalDate.now())) {
-            throw new InternalServerException("Дата рождения не может быть в будущем");
-        }
-
         update(
                 UPDATE_QUERY,
                 user.getName(),
@@ -152,14 +117,6 @@ public class UserDbStorage implements UserStorage {
     public void deleteFriend(Long userId, Long friendId) {
         existsUserById(userId);
         existsUserById(friendId);
-
-        // Проверяем, существует ли такая дружба
-        String checkFriendshipSql = "SELECT COUNT(*) FROM friends WHERE user_id = ? AND friend_id = ?";
-        Integer count = jdbc.queryForObject(checkFriendshipSql, Integer.class, userId, friendId);
-        if (count == 0) {
-            throw new InternalServerException("Пользователи с ID " + userId + " и " + friendId + " не являются друзьями");
-        }
-
         String query = "DELETE FROM friends WHERE user_id = ? AND friend_id = ?";
         jdbc.update(query, userId, friendId);
     }

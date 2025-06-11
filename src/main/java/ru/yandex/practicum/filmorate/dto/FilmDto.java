@@ -6,7 +6,6 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import ru.yandex.practicum.filmorate.annotation.RealeaseDateMin;
-import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
@@ -17,7 +16,6 @@ import java.util.Set;
 public class FilmDto {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id;
-    private Set<Director> directors;
 
     @NotBlank
     private String name;
@@ -35,5 +33,4 @@ public class FilmDto {
     private Mpa mpa;
 
     private Set<Genre> genres;
-
 }

@@ -26,18 +26,18 @@ public class UpdateUserRequest {
     }
 
     public boolean hasName() {
-        return ! (name == null || name.isBlank());
+        return !(name == null || name.isBlank());
     }
 
     public boolean hasEmail() {
-        return ! (email == null || email.isBlank());
+        return !(email == null || email.isBlank());
     }
 
     public boolean hasLogin() {
-        return ! (login == null || login.isBlank());
+        return !(login == null || login.isBlank());
     }
 
     public boolean hasBirthday() {
-        return ! (birthday == null);
+        return !(birthday == null);
     }
 }
