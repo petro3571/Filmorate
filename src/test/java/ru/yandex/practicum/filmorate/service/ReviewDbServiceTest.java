@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.test.context.jdbc.Sql;
 import ru.yandex.practicum.filmorate.dal.FilmDbStorage;
 import ru.yandex.practicum.filmorate.dal.ReviewDbStorage;
@@ -19,7 +18,6 @@ import ru.yandex.practicum.filmorate.dto.ReviewDto;
 import ru.yandex.practicum.filmorate.dto.UpdateReviewDto;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.mapper.ReviewMapper;
-import ru.yandex.practicum.filmorate.model.Review;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -41,8 +39,8 @@ class ReviewDbServiceTest {
         ReviewDto dto3 = service.getReview(3L);
         ReviewDto dto4 = service.getReview(4L);
         ReviewDto dto5 = service.getReview(5L);
-        assertArrayEquals(new ReviewDto[] {dto5, dto2, dto1, dto4, dto3}, service.getReviews(null, 10).toArray());
-        assertArrayEquals(new ReviewDto[] {dto2, dto1}, service.getReviews(1L, 10).toArray());
+        assertArrayEquals(new ReviewDto[]{dto5, dto2, dto1, dto4, dto3}, service.getReviews(null, 10).toArray());
+        assertArrayEquals(new ReviewDto[]{dto2, dto1}, service.getReviews(1L, 10).toArray());
         assertTrue(service.getReviews(10L, 10).isEmpty()); // фильм, на который нет отзывов
         assertThrows(NotFoundException.class, () -> service.getReviews(12L, 10)); // фильм не существует
     }
@@ -104,7 +102,7 @@ class ReviewDbServiceTest {
         updateDto.setIsPositive(true);
         service.updateReview(updateDto);
         ReviewDto updatedReview = service.getReview(1L);
-        assertNotEquals(updatedReview,dto);
+        assertNotEquals(updatedReview, dto);
         assertEquals(updatedReview.getFilmId(), updateDto.getFilmId());
         assertEquals(updatedReview.getContent(), updateDto.getContent());
         assertEquals(updatedReview.getUserId(), updateDto.getUserId());
