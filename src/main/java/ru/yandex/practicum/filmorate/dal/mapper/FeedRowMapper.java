@@ -16,10 +16,10 @@ public class FeedRowMapper implements RowMapper<Feed> {
         feed.setId(rs.getLong("event_id"));
         feed.setUserId(rs.getLong("user_id"));
         LocalDate newLocalDate = rs.getDate("event_date").toLocalDate();
-        feed.setEvent_date(newLocalDate);
-        feed.setEntity_id(rs.getInt("entity_id"));
-        feed.setEvent_type(rs.getString("event_type"));
-        feed.setEvent_operation(rs.getString("event_operation"));
+        feed.setEventDate(newLocalDate);
+        feed.setEntityId(rs.getInt("entity_id"));
+        feed.setEventType(rs.getString("event_type"));
+        feed.setEventOperation(rs.getString("event_operation"));
 
         return feed;
     }

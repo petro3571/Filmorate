@@ -16,14 +16,14 @@ public class Feed {
     private Long userId;
 
     @PastOrPresent
-    private LocalDate event_date;
+    private LocalDate eventDate;
 
     @NotNull
-    private Integer entity_id;
+    private Integer entityId;
 
     @NotNull
-    private String event_type;
+    private String eventType;
 
     @NotNull
-    private String event_operation;
+    private String eventOperation;
 }
