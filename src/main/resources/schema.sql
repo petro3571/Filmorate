@@ -6,6 +6,15 @@ CREATE TABLE IF NOT EXISTS users (
             login VARCHAR(40) NOT NULL
           );
 
+CREATE TABLE IF NOT EXISTS event_type (
+            id INT PRIMARY KEY,
+            name VARCHAR(40) NOT NULL
+            );
+CREATE TABLE IF NOT EXISTS operations (
+            id INT PRIMARY KEY,
+            name VARCHAR(40) NOT NULL
+            );
+
 CREATE TABLE IF NOT EXISTS MPA (
             id INT PRIMARY KEY,
             name VARCHAR(40) NOT NULL
@@ -43,4 +52,13 @@ CREATE TABLE IF NOT EXISTS friends (
             user_id INTEGER REFERENCES users ON DELETE CASCADE,
             friend_id INTEGER REFERENCES users ON DELETE CASCADE,
             friend_confirm BOOLEAN DEFAULT FALSE
+            );
+
+CREATE TABLE IF NOT EXISTS feeds (
+            event_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+            user_id INTEGER REFERENCES users ON DELETE CASCADE,
+            event_date DATE NOT NULL,
+            entity_id INTEGER NOT NULL,
+            event_type_id INTEGER REFERENCES event_type ON DELETE CASCADE,
+            event_operation_id INTEGER REFERENCES operations ON DELETE CASCADE
             );

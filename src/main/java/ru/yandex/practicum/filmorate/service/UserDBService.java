@@ -1,29 +1,30 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.dal.UserDbStorage;
 import ru.yandex.practicum.filmorate.dto.NewUserRequest;
 import ru.yandex.practicum.filmorate.dto.UpdateUserRequest;
 import ru.yandex.practicum.filmorate.dto.UserDto;
 import ru.yandex.practicum.filmorate.exception.DataAlreadyExistException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.mapper.UserMapper;
+import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.FeedStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserDBService {
     private final UserStorage userDbStorage;
-
-    public UserDBService(UserDbStorage userDbStorage) {
-        this.userDbStorage = userDbStorage;
-    }
+    private final FeedStorage feedDbStorage;
 
     public List<UserDto> getUsers() {
         return userDbStorage.getAll()
@@ -91,5 +92,9 @@ public class UserDBService {
 
     public void confirmFriend(Long userId, Long friendId) {
         userDbStorage.confirmFriend(userId, friendId);
+    }
+
+    public Collection<Feed> getFeedUser(Long userId) {
+        return feedDbStorage.getFeedUser(userId);
     }
 }
