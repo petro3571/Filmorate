@@ -14,7 +14,9 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Repository
@@ -33,7 +35,7 @@ public class FilmDbStorage implements FilmStorage {
     private static final String DELETE_QUERY = "DELETE FROM films WHERE film_id = ?";
 
     private static final String NEWFIND = "SELECT f.film_id, f.title, f.description, f.release_date, f.duration, " +
-        "f.mpa_id, m.name FROM films AS f left JOIN mpa AS m ON f.MPA_id = m.id WHERE f.film_id = ?";
+            "f.mpa_id, m.name FROM films AS f left JOIN mpa AS m ON f.MPA_id = m.id WHERE f.film_id = ?";
 
     private static final String LIKE_QUERY = "INSERT INTO likes(film_id, user_id) VALUES(?, ?)";
 
@@ -42,6 +44,8 @@ public class FilmDbStorage implements FilmStorage {
     private static final String POPULAR_QUERY = "SELECT f.*, m.name AS mpa_name, COUNT(l.user_id) AS likes_count " +
             "FROM films f LEFT JOIN likes l ON f.film_id = l.film_id JOIN mpa m ON f.mpa_id = m.id " +
             "GROUP BY f.film_id ORDER BY likes_count DESC LIMIT ?";
+
+    private static final String EXISTS_QUERY = "SELECT 1 FROM films f WHERE f.film_id = ?";
 
     private final JdbcTemplate jdbc;
     private final FilmRowMapper mapper;
@@ -114,6 +118,19 @@ public class FilmDbStorage implements FilmStorage {
         return jdbc.query(POPULAR_QUERY, mapper, count);
     }
 
+    public boolean exists(Long filmId) {
+        try {
+            Integer result = jdbc.queryForObject(
+                    EXISTS_QUERY,
+                    Integer.class,
+                    filmId
+            );
+            return result != 0;
+        } catch (EmptyResultDataAccessException e) {
+            return false;
+        }
+    }
+
     private long insert(String query, Object... params) {
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(connection -> {
@@ -122,7 +139,8 @@ public class FilmDbStorage implements FilmStorage {
             for (int idx = 0; idx < params.length; idx++) {
                 ps.setObject(idx + 1, params[idx]);
             }
-            return ps; }, keyHolder);
+            return ps;
+        }, keyHolder);
 
         Long id = keyHolder.getKeyAs(Long.class);
 

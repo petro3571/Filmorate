@@ -39,6 +39,8 @@ public class UserDbStorage implements UserStorage {
     private static final String FIND_BY_EMAIL_QUERY = "SELECT user_id AS id, name AS username, email, login, birthday " +
             "FROM users WHERE email = ?";
 
+    private static final String EXISTS_QUERY = "SELECT 1 FROM users u WHERE u.user_id = ?";
+
     private final JdbcTemplate jdbc;
     private final UserRowMapper mapper;
 
@@ -136,6 +138,19 @@ public class UserDbStorage implements UserStorage {
                 userId + " не найден."));
     }
 
+    public boolean exists(Long userId) {
+        try {
+            Integer result = jdbc.queryForObject(
+                    EXISTS_QUERY,
+                    Integer.class,
+                    userId
+            );
+            return result != 0;
+        } catch (EmptyResultDataAccessException e) {
+            return false;
+        }
+    }
+
     @Override
     public Optional<User> findByEmail(String email) {
         try {
@@ -154,7 +169,8 @@ public class UserDbStorage implements UserStorage {
             for (int idx = 0; idx < params.length; idx++) {
                 ps.setObject(idx + 1, params[idx]);
             }
-            return ps; }, keyHolder);
+            return ps;
+        }, keyHolder);
 
         Long id = keyHolder.getKeyAs(Long.class);
 
