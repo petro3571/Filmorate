@@ -43,6 +43,16 @@ public class FilmDbStorage implements FilmStorage {
             "FROM films f LEFT JOIN likes l ON f.film_id = l.film_id JOIN mpa m ON f.mpa_id = m.id " +
             "GROUP BY f.film_id ORDER BY likes_count DESC LIMIT ?";
 
+    private static final String SEARCH_QUERY = "SELECT f.*, m.name AS mpa_name, COUNT(l.user_id) AS likes_count " +
+            "FROM films f " +
+            "LEFT JOIN likes l ON f.film_id = l.film_id " +
+            "JOIN mpa m ON f.mpa_id = m.id " +
+            "LEFT JOIN film_director fd ON f.film_id = fd.film_id " +
+            "LEFT JOIN directors d ON fd.director_id = d.id " +
+            "WHERE (LOWER(f.title) LIKE LOWER(?) OR LOWER(d.name) LIKE LOWER(?)) " +
+            "GROUP BY f.film_id " +
+            "ORDER BY likes_count DESC";
+
     private final JdbcTemplate jdbc;
     private final FilmRowMapper mapper;
 
@@ -112,6 +122,23 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Collection<Film> getPopularFilms(Integer count) {
         return jdbc.query(POPULAR_QUERY, mapper, count);
+    }
+
+    @Override
+    public Collection<Film> searchFilms(String query, List<String> by) {
+        String searchPattern = "%" + query.toLowerCase() + "%";
+
+        if (by.contains("title") && by.contains("director")) {
+            return jdbc.query(SEARCH_QUERY, mapper, searchPattern, searchPattern);
+        } else if (by.contains("title")) {
+            return jdbc.query(SEARCH_QUERY.replace("OR LOWER(d.name) LIKE LOWER(?)", ""),
+                    mapper, searchPattern);
+        } else if (by.contains("director")) {
+            return jdbc.query(SEARCH_QUERY.replace("LOWER(f.title) LIKE LOWER(?) OR ", ""),
+                    mapper, searchPattern);
+        }
+
+        return Collections.emptyList();
     }
 
     private long insert(String query, Object... params) {

@@ -8,12 +8,10 @@ import ru.yandex.practicum.filmorate.dto.NewFilmRequest;
 import ru.yandex.practicum.filmorate.dto.UpdateFilmRequest;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.mapper.FilmMapper;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.GenreStorage;
-import ru.yandex.practicum.filmorate.storage.MpaStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -27,6 +25,7 @@ public class FilmDbService {
     private final GenreStorage genreDbStorage;
     private final MpaStorage mpaDbStorage;
     private final UserStorage userDbStorage;
+    private final DirectorStorage directorStorage;
 
     public Collection<FilmDto> getAll() {
         Collection<Film> films = filmDbStorage.getAll();
@@ -38,21 +37,24 @@ public class FilmDbService {
         List<Long> listFilmIds = films.stream().map(Film::getId).collect(Collectors.toList());
 
         Map<Long, Set<Genre>> genresForFilms = genreDbStorage.getGenresForFilms(listFilmIds);
+        Map<Long, Set<Director>> directorsForFilms = directorStorage.getDirectorsForFilms(listFilmIds);
 
-        films.forEach(film -> film.setGenres(genresForFilms.getOrDefault(film.getId(), new HashSet<>())));
+        films.forEach(film -> {
+            film.setGenres(genresForFilms.getOrDefault(film.getId(), new HashSet<>()));
+            film.setDirectors(directorsForFilms.getOrDefault(film.getId(), new HashSet<>()));
+        });
 
-        return films
-                .stream()
+        return films.stream()
                 .map(FilmMapper::mapToFilmDto)
                 .collect(Collectors.toList());
     }
 
     public FilmDto getFilm(Long filmId) {
-        FilmDto filmDto = filmDbStorage.getFilm(filmId).map(FilmMapper::mapToFilmDto).orElseThrow(() -> new NotFoundException("Фильм с ID " +
-                filmId + " не найден."));
+        FilmDto filmDto = filmDbStorage.getFilm(filmId).map(FilmMapper::mapToFilmDto)
+                .orElseThrow(() -> new NotFoundException("Фильм с ID " + filmId + " не найден."));
 
         filmDto.setGenres(genreDbStorage.getFilmGenres(filmId));
-
+        filmDto.setDirectors(directorStorage.getFilmDirectors(filmId));
         return filmDto;
     }
 
@@ -133,9 +135,30 @@ public class FilmDbService {
         List<Long> listFilmIds = popularfilms.stream().map(Film::getId).collect(Collectors.toList());
 
         Map<Long, Set<Genre>> genresForFilms = genreDbStorage.getGenresForFilms(listFilmIds);
+        Map<Long, Set<Director>> directorsForFilms = directorStorage.getDirectorsForFilms(listFilmIds);
 
-        popularfilms.forEach(film -> film.setGenres(genresForFilms.getOrDefault(film.getId(), new HashSet<>())));
+        popularfilms.forEach(film -> {
+            film.setGenres(genresForFilms.getOrDefault(film.getId(), new HashSet<>()));
+            film.setDirectors(directorsForFilms.getOrDefault(film.getId(), new HashSet<>()));
+        });
 
         return popularfilms;
+    }
+
+    public Collection<Film> searchFilms(String query, List<String> by) {
+        Collection<Film> films = filmDbStorage.searchFilms(query, by);
+
+        if (!films.isEmpty()) {
+            List<Long> listFilmIds = films.stream().map(Film::getId).collect(Collectors.toList());
+            Map<Long, Set<Genre>> genresForFilms = genreDbStorage.getGenresForFilms(listFilmIds);
+            Map<Long, Set<Director>> directorsForFilms = directorStorage.getDirectorsForFilms(listFilmIds);
+
+            films.forEach(film -> {
+                film.setGenres(genresForFilms.getOrDefault(film.getId(), new HashSet<>()));
+                film.setDirectors(directorsForFilms.getOrDefault(film.getId(), new HashSet<>()));
+            });
+        }
+
+        return films;
     }
 }

@@ -68,7 +68,6 @@ public class UserDBService {
 
     public UserDto updateUser(UpdateUserRequest request) {
         User newUser = UserMapper.updateUserFields(new User(), request);
-
         if (!(userDbStorage.getUser(newUser.getId()).isPresent())) {
             throw new NotFoundException("Пользователь не найден");
         }

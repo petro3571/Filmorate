@@ -17,8 +17,8 @@ public final class UserMapper {
         user.setLogin(request.getLogin());
         user.setEmail(request.getEmail());
         user.setBirthday(request.getBirthday());
-
         return user;
+
     }
 
     public static UserDto mapToUserDto(User user) {

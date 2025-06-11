@@ -10,7 +10,9 @@ import ru.yandex.practicum.filmorate.dto.UpdateFilmRequest;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmDbService;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -58,5 +60,14 @@ public class FilmController {
     @GetMapping("/popular")
     public Collection<Film> getPopularFilms(@RequestParam(name = "count", defaultValue = "10") Integer count) {
         return filmService.getPopularFilms(count);
+    }
+
+    @GetMapping("/search")
+    public Collection<Film> searchFilms(
+            @RequestParam String query,
+            @RequestParam(defaultValue = "title,director") String by) {
+
+        List<String> searchBy = Arrays.asList(by.split(","));
+        return filmService.searchFilms(query, searchBy);
     }
 }

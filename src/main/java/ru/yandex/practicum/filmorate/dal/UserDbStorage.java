@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.dal;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -18,27 +19,24 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Repository
 @RequiredArgsConstructor
 @Qualifier("userDbStorage")
 public class UserDbStorage implements UserStorage {
+
     private static final String INSERT_QUERY = "INSERT INTO users(name, email, login, birthday) " +
             "VALUES (?, ?, ?, ?)";
 
     private static final String UPDATE_QUERY = "UPDATE users SET name = ?, email = ?, login = ?, birthday = ? " +
             "WHERE user_id = ?";
-
     private static final String DELETE_QUERY = "DELETE FROM users WHERE user_id = ?";
-
     private static final String FIND_ALL_QUERY = "SELECT user_id AS id, name AS username, email, login, birthday " +
             "FROM users";
-
     private static final String FIND_BY_ID_QUERY = "SELECT user_id AS id, name AS username, email, login, birthday " +
             "FROM users WHERE user_id = ?";
-
     private static final String FIND_BY_EMAIL_QUERY = "SELECT user_id AS id, name AS username, email, login, birthday " +
             "FROM users WHERE email = ?";
-
     private final JdbcTemplate jdbc;
     private final UserRowMapper mapper;
 
@@ -126,7 +124,6 @@ public class UserDbStorage implements UserStorage {
         existsUserById(userId);
         existsUserById(otherId);
         String query = "SELECT friend_id FROM friends WHERE user_id = ? AND friend_id IN (SELECT friend_id FROM friends WHERE user_id = ?)";
-
         return jdbc.queryForList(query, Long.class, userId, otherId).stream().map(friendId -> getUser(friendId)).collect(Collectors.toList());
     }
 
@@ -156,9 +153,7 @@ public class UserDbStorage implements UserStorage {
             }
             return ps;
         }, keyHolder);
-
         Long id = keyHolder.getKeyAs(Long.class);
-
         if (id != null) {
             return id;
         } else {

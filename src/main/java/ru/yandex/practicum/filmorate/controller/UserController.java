@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.dto.NewUserRequest;
 import ru.yandex.practicum.filmorate.dto.UpdateUserRequest;
@@ -27,24 +26,25 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<UserDto> getUserById(@PathVariable("userId") Long userId) {
-        return ResponseEntity.ok(userService.getUserById(userId));
+    public UserDto getUserById(@PathVariable("userId") Long userId) {
+        return userService.getUserById(userId);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<UserDto> createUser(@Valid @RequestBody NewUserRequest userRequest) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(userRequest));
+    public UserDto createUser(@Valid @RequestBody NewUserRequest userRequest) {
+        return userService.createUser(userRequest);
     }
 
     @PutMapping
-    public ResponseEntity<UserDto> updateUser(@Valid @RequestBody UpdateUserRequest userRequest) {
-        return ResponseEntity.ok(userService.updateUser(userRequest));
+    @ResponseStatus(HttpStatus.OK)
+    public UserDto updateUser(@Valid @RequestBody UpdateUserRequest userRequest) {
+        return userService.updateUser(userRequest);
     }
 
     @DeleteMapping("/{userId}")
-    public ResponseEntity<UserDto> deleteUser(@PathVariable("userId") Long userId) {
-        return ResponseEntity.ok(userService.deleteUser(userId));
+    public UserDto deleteUser(@PathVariable("userId") Long userId) {
+        return userService.deleteUser(userId);
     }
 
     @PutMapping("/{userId}/friends/{friendId}")

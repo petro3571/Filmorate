@@ -36,6 +36,27 @@ class FilmorateDbApplicationTests {
     private User testUser;
     private Film testFilm;
 
+    private User createTestUser() {
+        User user = new User();
+        user.setEmail("test@example.com");
+        user.setLogin("testLogin");
+        user.setName("Test User");
+        user.setBirthday(LocalDate.of(1990, 1, 1));
+        return user;
+    }
+
+    @Test
+    void testUserFields() {
+        User testUser = createTestUser();
+        User createdUser = userDbStorage.saveUser(testUser);
+
+        assertNotNull(createdUser.getId(), "Поле 'id' должно быть заполнено");
+        assertNotNull(createdUser.getEmail(), "Поле 'email' должно быть заполнено");
+        assertNotNull(createdUser.getName(), "Поле 'name' должно быть заполнено");
+        assertNotNull(createdUser.getLogin(), "Поле 'login' должно быть заполнено");
+        assertNotNull(createdUser.getBirthday(), "Поле 'birthday' должно быть заполнено");
+    }
+
     @Test
     void shouldRunWorkWithUsers() {
         testUser = new User();
@@ -134,5 +155,31 @@ class FilmorateDbApplicationTests {
         Film newFilm = popularFilm.stream().findFirst().get();
 
         assertEquals(newFilm.getName(), "Test Film Name");
+    }
+
+    @Test
+    void shouldSearchFilms() {
+        Film film1 = new Film();
+        film1.setName("Test Film One");
+        film1.setDescription("Description One");
+        film1.setReleaseDate(LocalDate.of(2000, 1, 1));
+        film1.setDuration(120);
+        film1.setMpa(new Mpa(1, null));
+
+        Film createdFilm1 = filmDbStorage.create(film1);
+
+        Film film2 = new Film();
+        film2.setName("Another Film");
+        film2.setDescription("Description Two");
+        film2.setReleaseDate(LocalDate.of(2001, 1, 1));
+        film2.setDuration(150);
+        film2.setMpa(new Mpa(2, null));
+
+        Film createdFilm2 = filmDbStorage.create(film2);
+
+        Collection<Film> searchResult = filmDbStorage.searchFilms("one", List.of("title"));
+        assertEquals(1, searchResult.size());
+        assertTrue(searchResult.stream().anyMatch(f -> f.getName().equals("Test Film One")));
+
     }
 }

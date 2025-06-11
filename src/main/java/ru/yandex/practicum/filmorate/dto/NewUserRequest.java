@@ -11,12 +11,14 @@ import java.time.LocalDate;
 @Data
 public class NewUserRequest {
     private String name;
-    @NotBlank
-    private String login;
-    @Email
-    private String email;
-    @PastOrPresent
-    private LocalDate birthday;
 
-    private Mpa mpa;
+    @NotBlank(message = "Логин не может быть пустым")
+    private String login;
+
+    @Email(message = "Email должен быть валидным")
+    @NotBlank(message = "Email не может быть пустым")
+    private String email;
+
+    @PastOrPresent(message = "Дата рождения не может быть в будущем")
+    private LocalDate birthday;
 }

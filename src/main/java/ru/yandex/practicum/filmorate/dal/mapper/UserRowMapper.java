@@ -11,16 +11,13 @@ import java.time.LocalDate;
 @Component
 public class UserRowMapper implements RowMapper<User> {
     @Override
-    public User mapRow(ResultSet resultSet, int rowNum) throws SQLException {
+    public User mapRow(ResultSet rs, int rowNum) throws SQLException {
         User user = new User();
-        user.setId(resultSet.getLong("id"));
-        user.setName(resultSet.getString("username"));
-        user.setEmail(resultSet.getString("email"));
-        user.setLogin(resultSet.getString("login"));
-
-        LocalDate newLocalDate = resultSet.getDate("birthday").toLocalDate();
-        user.setBirthday(newLocalDate);
-
+        user.setId(rs.getLong("user_id"));
+        user.setEmail(rs.getString("email"));
+        user.setName(rs.getString("name"));
+        user.setLogin(rs.getString("login"));
+        user.setBirthday(rs.getDate("birthday").toLocalDate());
         return user;
     }
 }
