@@ -2,11 +2,12 @@ package ru.yandex.practicum.filmorate.mapper;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import ru.yandex.practicum.filmorate.dto.*;
+import ru.yandex.practicum.filmorate.dto.FilmDto;
+import ru.yandex.practicum.filmorate.dto.NewFilmRequest;
+import ru.yandex.practicum.filmorate.dto.UpdateFilmRequest;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.HashSet;
-
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FilmMapper {
@@ -42,9 +43,10 @@ public final class FilmMapper {
         if (film.getMpa() != null && film.getMpa().getId() != 0) {
             dto.setMpa(film.getMpa());
         } else {
-            film.setMpa(null);
+            dto.setMpa(null);
         }
-        dto.setGenres(film.getGenres());
+        dto.setGenres(film.getGenres() != null ? film.getGenres() : new HashSet<>());
+        dto.setDirectors(film.getDirectors() != null ? film.getDirectors() : new HashSet<>());
         return dto;
     }
 

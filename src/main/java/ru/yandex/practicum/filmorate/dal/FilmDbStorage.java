@@ -21,11 +21,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Qualifier("filmDbStorage")
 public class FilmDbStorage implements FilmStorage {
-    private static final String INSERT_QUERY = "INSERT INTO films(title, description, release_date, duration, MPA_id)" +
+    private static final String INSERT_QUERY = "INSERT INTO films(title, description, release_date, duration, MPA_id) " +
             "VALUES (?, ?, ?, ?, ?)";
 
     private static final String FIND_ALL_QUERY = "SELECT f.film_id, f.title, f.description, f.release_date, " +
-            "f.duration, f.mpa_id, m.name FROM films AS f left JOIN mpa AS m ON f.MPA_id = m.id";
+            "f.duration, f.mpa_id, m.name FROM films AS f LEFT JOIN mpa AS m ON f.MPA_id = m.id";
 
     private static final String UPDATE_QUERY = "UPDATE films SET title = ?, description = ?, release_date = ?, " +
             "duration = ?, mpa_id = ? WHERE film_id = ?";
@@ -33,25 +33,28 @@ public class FilmDbStorage implements FilmStorage {
     private static final String DELETE_QUERY = "DELETE FROM films WHERE film_id = ?";
 
     private static final String NEWFIND = "SELECT f.film_id, f.title, f.description, f.release_date, f.duration, " +
-            "f.mpa_id, m.name FROM films AS f left JOIN mpa AS m ON f.MPA_id = m.id WHERE f.film_id = ?";
+            "f.mpa_id, m.name FROM films AS f LEFT JOIN mpa AS m ON f.MPA_id = m.id WHERE f.film_id = ?";
 
     private static final String LIKE_QUERY = "INSERT INTO likes(film_id, user_id) VALUES(?, ?)";
 
     private static final String DELETE_LIKE_QUERY = "DELETE FROM likes WHERE film_id = ? AND user_id = ?";
 
-    private static final String POPULAR_QUERY = "SELECT f.*, m.name AS mpa_name, COUNT(l.user_id) AS likes_count " +
-            "FROM films f LEFT JOIN likes l ON f.film_id = l.film_id JOIN mpa m ON f.mpa_id = m.id " +
-            "GROUP BY f.film_id ORDER BY likes_count DESC LIMIT ?";
+    private static final String POPULAR_QUERY = "SELECT f.film_id, f.title, f.description, f.release_date, f.duration, " +
+            "f.mpa_id, m.name FROM films f " +
+            "LEFT JOIN likes l ON f.film_id = l.film_id " +
+            "JOIN mpa m ON f.mpa_id = m.id " +
+            "GROUP BY f.film_id, m.name " +
+            "ORDER BY COUNT(l.user_id) DESC LIMIT ?";
 
-    private static final String SEARCH_QUERY = "SELECT f.*, m.name AS mpa_name, COUNT(l.user_id) AS likes_count " +
-            "FROM films f " +
+    private static final String SEARCH_QUERY = "SELECT f.film_id, f.title, f.description, f.release_date, f.duration, " +
+            "f.mpa_id, m.name FROM films f " +
             "LEFT JOIN likes l ON f.film_id = l.film_id " +
             "JOIN mpa m ON f.mpa_id = m.id " +
             "LEFT JOIN film_director fd ON f.film_id = fd.film_id " +
             "LEFT JOIN directors d ON fd.director_id = d.id " +
             "WHERE (LOWER(f.title) LIKE LOWER(?) OR LOWER(d.name) LIKE LOWER(?)) " +
-            "GROUP BY f.film_id " +
-            "ORDER BY likes_count DESC";
+            "GROUP BY f.film_id, m.name " +
+            "ORDER BY COUNT(l.user_id) DESC";
 
     private final JdbcTemplate jdbc;
     private final FilmRowMapper mapper;
@@ -131,11 +134,11 @@ public class FilmDbStorage implements FilmStorage {
         if (by.contains("title") && by.contains("director")) {
             return jdbc.query(SEARCH_QUERY, mapper, searchPattern, searchPattern);
         } else if (by.contains("title")) {
-            return jdbc.query(SEARCH_QUERY.replace("OR LOWER(d.name) LIKE LOWER(?)", ""),
-                    mapper, searchPattern);
+            String sql = SEARCH_QUERY.replace("OR LOWER(d.name) LIKE LOWER(?)", "");
+            return jdbc.query(sql, mapper, searchPattern);
         } else if (by.contains("director")) {
-            return jdbc.query(SEARCH_QUERY.replace("LOWER(f.title) LIKE LOWER(?) OR ", ""),
-                    mapper, searchPattern);
+            String sql = SEARCH_QUERY.replace("LOWER(f.title) LIKE LOWER(?) OR ", "");
+            return jdbc.query(sql, mapper, searchPattern);
         }
 
         return Collections.emptyList();
@@ -193,11 +196,12 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     private void updateGenres(Film film) {
+        String deleteSql = "DELETE FROM film_genre WHERE film_id = ?";
+        jdbc.update(deleteSql, film.getId());
+
         if (film.getGenres() == null || film.getGenres().isEmpty()) {
             return;
         }
-        String deleteSql = "DELETE FROM film_genre WHERE film_id = ?";
-        jdbc.update(deleteSql, film.getId());
 
         String sql = "INSERT INTO film_genre(film_id, genre_id) VALUES (?, ?)";
 
