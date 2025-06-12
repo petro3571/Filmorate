@@ -20,6 +20,7 @@ import ru.yandex.practicum.filmorate.dal.UserDbStorage;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -174,6 +175,11 @@ class FilmorateDbApplicationTests {
         film2.setReleaseDate(LocalDate.of(2001, 1, 1));
         film2.setDuration(150);
         film2.setMpa(new Mpa(2, null));
+        film1.setGenres(new HashSet<>());
+        film1.setDirectors(new HashSet<>());
+
+        film2.setGenres(new HashSet<>());
+        film2.setDirectors(new HashSet<>());
 
         Film createdFilm2 = filmDbStorage.create(film2);
 

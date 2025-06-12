@@ -56,6 +56,34 @@ public class FilmDbStorage implements FilmStorage {
             "GROUP BY f.film_id, m.name " +
             "ORDER BY COUNT(l.user_id) DESC";
 
+    private static final String SEARCH_BY_TITLE_AND_DIRECTOR = "SELECT f.film_id, f.title, f.description, f.release_date, f.duration, " +
+            "f.mpa_id, m.name FROM films f " +
+            "LEFT JOIN likes l ON f.film_id = l.film_id " +
+            "JOIN mpa m ON f.mpa_id = m.id " +
+            "LEFT JOIN film_director fd ON f.film_id = fd.film_id " +
+            "LEFT JOIN directors d ON fd.director_id = d.id " +
+            "WHERE (LOWER(f.title) LIKE LOWER(?) OR LOWER(d.name) LIKE LOWER(?)) " +
+            "GROUP BY f.film_id, m.name " +
+            "ORDER BY COUNT(l.user_id) DESC";
+
+    private static final String SEARCH_BY_TITLE = "SELECT f.film_id, f.title, f.description, f.release_date, f.duration, " +
+            "f.mpa_id, m.name FROM films f " +
+            "LEFT JOIN likes l ON f.film_id = l.film_id " +
+            "JOIN mpa m ON f.mpa_id = m.id " +
+            "WHERE LOWER(f.title) LIKE LOWER(?) " +
+            "GROUP BY f.film_id, m.name " +
+            "ORDER BY COUNT(l.user_id) DESC";
+
+    private static final String SEARCH_BY_DIRECTOR = "SELECT f.film_id, f.title, f.description, f.release_date, f.duration, " +
+            "f.mpa_id, m.name FROM films f " +
+            "LEFT JOIN likes l ON f.film_id = l.film_id " +
+            "JOIN mpa m ON f.mpa_id = m.id " +
+            "LEFT JOIN film_director fd ON f.film_id = fd.film_id " +
+            "LEFT JOIN directors d ON fd.director_id = d.id " +
+            "WHERE LOWER(d.name) LIKE LOWER(?) " +
+            "GROUP BY f.film_id, m.name " +
+            "ORDER BY COUNT(l.user_id) DESC";
+
     private final JdbcTemplate jdbc;
     private final FilmRowMapper mapper;
 
@@ -132,13 +160,11 @@ public class FilmDbStorage implements FilmStorage {
         String searchPattern = "%" + query.toLowerCase() + "%";
 
         if (by.contains("title") && by.contains("director")) {
-            return jdbc.query(SEARCH_QUERY, mapper, searchPattern, searchPattern);
+            return jdbc.query(SEARCH_BY_TITLE_AND_DIRECTOR, mapper, searchPattern, searchPattern);
         } else if (by.contains("title")) {
-            String sql = SEARCH_QUERY.replace("OR LOWER(d.name) LIKE LOWER(?)", "");
-            return jdbc.query(sql, mapper, searchPattern);
+            return jdbc.query(SEARCH_BY_TITLE, mapper, searchPattern);
         } else if (by.contains("director")) {
-            String sql = SEARCH_QUERY.replace("LOWER(f.title) LIKE LOWER(?) OR ", "");
-            return jdbc.query(sql, mapper, searchPattern);
+            return jdbc.query(SEARCH_BY_DIRECTOR, mapper, searchPattern);
         }
 
         return Collections.emptyList();
