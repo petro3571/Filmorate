@@ -107,26 +107,16 @@ public class FilmDbStorage implements FilmStorage {
         existFilmById(filmId);
         jdbc.update(LIKE_QUERY, filmId, userId);
 
-        String queryForEntityId = "SELECT id FROM likes WHERE film_id = ? AND user_id = ?";
-        List<Integer> entityIds = jdbc.queryForList(queryForEntityId,Integer.class, filmId, userId);
-
-        if (!entityIds.isEmpty()) {
-            String feedquery = "INSERT INTO feeds (user_id, timestamp, entity_id, event_type_id, event_operation_id) VALUES (?,?,?,?,?)";
-            update(feedquery, userId, Instant.now().toEpochMilli(), entityIds.get(0), 1, 2);
-        }
+        String feedquery = "INSERT INTO feeds (user_id, timestamp, entity_id, event_type_id, event_operation_id) VALUES (?,?,?,?,?)";
+        update(feedquery, userId, Instant.now().toEpochMilli(), filmId, 1, 2);
     }
 
     @Override
     public void deleteLike(Long filmId, Long userId) {
         existFilmById(filmId);
 
-        String queryForEntityId = "SELECT id FROM likes WHERE film_id = ? AND user_id = ?";
-        List<Integer> entityIds = jdbc.queryForList(queryForEntityId,Integer.class, filmId, userId);
-
-        if (!entityIds.isEmpty()) {
-            String feedQuery = "INSERT INTO feeds (user_id, timestamp, entity_id, event_type_id, event_operation_id) VALUES (?,?,?,?,?)";
-            update(feedQuery, userId, Instant.now().toEpochMilli(), entityIds.get(0), 1, 1);
-        }
+        String feedQuery = "INSERT INTO feeds (user_id, timestamp, entity_id, event_type_id, event_operation_id) VALUES (?,?,?,?,?)";
+        update(feedQuery, userId, Instant.now().toEpochMilli(), filmId, 1, 1);
 
         jdbc.update(DELETE_LIKE_QUERY, filmId, userId);
     }

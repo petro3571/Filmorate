@@ -101,14 +101,8 @@ public class UserDbStorage implements UserStorage {
         String query = "INSERT INTO friends (user_id, friend_id) VALUES (?, ?)";
         update(query, userId, friendId);
 
-
-        String queryForEntityId = "SELECT id FROM friends WHERE user_id = ? AND friend_id = ?";
-        List<Integer> entityIds = jdbc.queryForList(queryForEntityId,Integer.class, userId, friendId);
-
-        if (!entityIds.isEmpty()) {
-            String feedquery = "INSERT INTO feeds (user_id, timestamp, entity_id, event_type_id, event_operation_id) VALUES (?,?,?,?,?)";
-            update(feedquery, userId, Instant.now().toEpochMilli(), entityIds.get(0), 3, 2);
-        }
+        String feedquery = "INSERT INTO feeds (user_id, timestamp, entity_id, event_type_id, event_operation_id) VALUES (?,?,?,?,?)";
+        update(feedquery, userId, Instant.now().toEpochMilli(), friendId, 3, 2);
     }
 
     @Override
@@ -118,14 +112,8 @@ public class UserDbStorage implements UserStorage {
         String query = "UPDATE friends SET friend_confirm = true WHERE user_id = ? AND friend_id = ?";
         update(query, userId, friendId);
 
-        String queryForEntityId = "SELECT id FROM friends WHERE user_id = ? AND friend_id = ?";
-
-        List<Integer> entityIds = jdbc.queryForList(queryForEntityId,Integer.class, userId, friendId);
-
-        if (!entityIds.isEmpty()) {
-            String feedQuery = "INSERT INTO feeds (user_id, timestamp, entity_id, event_type_id, event_operation_id) VALUES (?,?,?,?,?)";
-            update(feedQuery, userId, Instant.now().toEpochMilli(), entityIds.get(0), 3, 3);
-        }
+        String feedQuery = "INSERT INTO feeds (user_id, timestamp, entity_id, event_type_id, event_operation_id) VALUES (?,?,?,?,?)";
+        update(feedQuery, userId, Instant.now().toEpochMilli(), friendId, 3, 3);
     }
 
     @Override
@@ -140,14 +128,8 @@ public class UserDbStorage implements UserStorage {
         existsUserById(userId);
         existsUserById(friendId);
 
-        String queryForEntityId = "SELECT id FROM friends WHERE user_id = ? AND friend_id = ?";
-
-        List<Integer> entityIds = jdbc.queryForList(queryForEntityId,Integer.class, userId, friendId);
-
-        if (!entityIds.isEmpty()) {
-            String feedQuery = "INSERT INTO feeds (user_id, timestamp, entity_id, event_type_id, event_operation_id) VALUES (?,?,?,?,?)";
-            update(feedQuery, userId, Instant.now().toEpochMilli(), entityIds.get(0), 3, 1);
-        }
+        String feedQuery = "INSERT INTO feeds (user_id, timestamp, entity_id, event_type_id, event_operation_id) VALUES (?,?,?,?,?)";
+        update(feedQuery, userId, Instant.now().toEpochMilli(), friendId, 3, 1);
 
         String query = "DELETE FROM friends WHERE user_id = ? AND friend_id = ?";
         jdbc.update(query, userId, friendId);

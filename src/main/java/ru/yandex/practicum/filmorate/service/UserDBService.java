@@ -3,13 +3,14 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dto.FeedDto;
 import ru.yandex.practicum.filmorate.dto.NewUserRequest;
 import ru.yandex.practicum.filmorate.dto.UpdateUserRequest;
 import ru.yandex.practicum.filmorate.dto.UserDto;
 import ru.yandex.practicum.filmorate.exception.DataAlreadyExistException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.mapper.FeedMapper;
 import ru.yandex.practicum.filmorate.mapper.UserMapper;
-import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FeedStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -94,7 +95,7 @@ public class UserDBService {
         userDbStorage.confirmFriend(userId, friendId);
     }
 
-    public Collection<Feed> getFeedUser(Long userId) {
-        return feedDbStorage.getFeedUser(userId);
+    public Collection<FeedDto> getFeedUser(Long userId) {
+        return feedDbStorage.getFeedUser(userId).stream().map(FeedMapper::mapToFeedDto).collect(Collectors.toList());
     }
 }
