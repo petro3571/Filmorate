@@ -26,6 +26,7 @@ public class FilmDbService {
     private final MpaStorage mpaDbStorage;
     private final UserStorage userDbStorage;
     private final DirectorStorage directorStorage;
+    private DirectorService directorService;
 
     public Collection<FilmDto> getAll() {
         Collection<Film> films = filmDbStorage.getAll();
@@ -150,6 +151,25 @@ public class FilmDbService {
 
     public Collection<Film> searchFilms(String query, List<String> by) {
         Collection<Film> films = filmDbStorage.searchFilms(query, by);
+
+        if (!films.isEmpty()) {
+            List<Long> listFilmIds = films.stream().map(Film::getId).collect(Collectors.toList());
+            Map<Long, Set<Genre>> genresForFilms = genreDbStorage.getGenresForFilms(listFilmIds);
+            Map<Long, Set<Director>> directorsForFilms = directorStorage.getDirectorsForFilms(listFilmIds);
+
+            films.forEach(film -> {
+                film.setGenres(genresForFilms.getOrDefault(film.getId(), new HashSet<>()));
+                film.setDirectors(directorsForFilms.getOrDefault(film.getId(), new HashSet<>()));
+            });
+        }
+
+        return films;
+    }
+
+    public Collection<Film> getFilmsByDirector(Long directorId, String sortBy) {
+        directorService.getById(directorId);
+
+        Collection<Film> films = filmDbStorage.getFilmsByDirector(directorId, sortBy);
 
         if (!films.isEmpty()) {
             List<Long> listFilmIds = films.stream().map(Film::getId).collect(Collectors.toList());

@@ -72,7 +72,18 @@ public class FilmController {
             @RequestParam String query,
             @RequestParam(defaultValue = "title,director") String by) {
 
+        if (query == null || query.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Параметр query не может быть пустым");
+        }
+
         List<String> searchBy = Arrays.asList(by.split(","));
         return filmService.searchFilms(query, searchBy);
+    }
+
+    @GetMapping("/director/{directorId}")
+    public Collection<Film> getFilmsByDirector(@PathVariable Long directorId,
+                                               @RequestParam(defaultValue = "likes") String sortBy) {
+        // Исправлено: добавлен новый метод в сервис
+        return filmService.getFilmsByDirector(directorId, sortBy);
     }
 }

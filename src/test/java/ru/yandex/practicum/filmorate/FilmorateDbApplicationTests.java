@@ -12,6 +12,7 @@ import ru.yandex.practicum.filmorate.dal.mapper.FilmRowMapper;
 import ru.yandex.practicum.filmorate.dal.mapper.GenreRowMapper;
 import ru.yandex.practicum.filmorate.dal.mapper.MpaRowMapper;
 import ru.yandex.practicum.filmorate.dal.mapper.UserRowMapper;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
@@ -19,10 +20,7 @@ import ru.yandex.practicum.filmorate.dal.FilmDbStorage;
 import ru.yandex.practicum.filmorate.dal.UserDbStorage;
 
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -116,6 +114,11 @@ class FilmorateDbApplicationTests {
         testFilm.setReleaseDate(LocalDate.of(2000, 1, 1));
         testFilm.setDuration(120);
         testFilm.setMpa(new Mpa(1, null));
+
+        Director director = new Director();
+        director.setId(1L);
+        director.setName("Test Director");
+        testFilm.setDirectors(Set.of(director));
 
         User createdUser = userDbStorage.saveUser(testUser);
 

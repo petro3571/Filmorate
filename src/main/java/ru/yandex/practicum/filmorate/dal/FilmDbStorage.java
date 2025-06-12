@@ -23,29 +23,21 @@ import java.util.stream.Collectors;
 public class FilmDbStorage implements FilmStorage {
     private static final String INSERT_QUERY = "INSERT INTO films(title, description, release_date, duration, MPA_id) " +
             "VALUES (?, ?, ?, ?, ?)";
-
     private static final String FIND_ALL_QUERY = "SELECT f.film_id, f.title, f.description, f.release_date, " +
             "f.duration, f.mpa_id, m.name FROM films AS f LEFT JOIN mpa AS m ON f.MPA_id = m.id";
-
     private static final String UPDATE_QUERY = "UPDATE films SET title = ?, description = ?, release_date = ?, " +
             "duration = ?, mpa_id = ? WHERE film_id = ?";
-
     private static final String DELETE_QUERY = "DELETE FROM films WHERE film_id = ?";
-
     private static final String NEWFIND = "SELECT f.film_id, f.title, f.description, f.release_date, f.duration, " +
             "f.mpa_id, m.name FROM films AS f LEFT JOIN mpa AS m ON f.MPA_id = m.id WHERE f.film_id = ?";
-
     private static final String LIKE_QUERY = "INSERT INTO likes(film_id, user_id) VALUES(?, ?)";
-
     private static final String DELETE_LIKE_QUERY = "DELETE FROM likes WHERE film_id = ? AND user_id = ?";
-
     private static final String POPULAR_QUERY = "SELECT f.film_id, f.title, f.description, f.release_date, f.duration, " +
             "f.mpa_id, m.name FROM films f " +
             "LEFT JOIN likes l ON f.film_id = l.film_id " +
             "JOIN mpa m ON f.mpa_id = m.id " +
             "GROUP BY f.film_id, m.name " +
             "ORDER BY COUNT(l.user_id) DESC LIMIT ?";
-
     private static final String SEARCH_QUERY = "SELECT f.film_id, f.title, f.description, f.release_date, f.duration, " +
             "f.mpa_id, m.name FROM films f " +
             "LEFT JOIN likes l ON f.film_id = l.film_id " +
@@ -118,7 +110,6 @@ public class FilmDbStorage implements FilmStorage {
                 film.getMpa().getId(),
                 film.getId()
         );
-
         updateGenres(film);
         return getFilm(film.getId()).orElseThrow(() -> new IllegalStateException("Не удалось обновить фильм с Id " + film.getId()));
     }
@@ -159,6 +150,10 @@ public class FilmDbStorage implements FilmStorage {
     public Collection<Film> searchFilms(String query, List<String> by) {
         String searchPattern = "%" + query.toLowerCase() + "%";
 
+        if (by == null || by.isEmpty()) {
+            by = List.of("title");
+        }
+
         if (by.contains("title") && by.contains("director")) {
             return jdbc.query(SEARCH_BY_TITLE_AND_DIRECTOR, mapper, searchPattern, searchPattern);
         } else if (by.contains("title")) {
@@ -168,6 +163,30 @@ public class FilmDbStorage implements FilmStorage {
         }
 
         return Collections.emptyList();
+    }
+
+    @Override
+    public Collection<Film> getFilmsByDirector(Long directorId, String sortBy) {
+        String sql;
+        if ("year".equals(sortBy)) {
+            sql = "SELECT f.film_id, f.title, f.description, f.release_date, f.duration, " +
+                    "f.mpa_id, m.name FROM films f " +
+                    "JOIN film_director fd ON f.film_id = fd.film_id " +
+                    "JOIN mpa m ON f.mpa_id = m.id " +
+                    "WHERE fd.director_id = ? " +
+                    "ORDER BY f.release_date";
+        } else {
+            sql = "SELECT f.film_id, f.title, f.description, f.release_date, f.duration, " +
+                    "f.mpa_id, m.name FROM films f " +
+                    "LEFT JOIN likes l ON f.film_id = l.film_id " +
+                    "JOIN film_director fd ON f.film_id = fd.film_id " +
+                    "JOIN mpa m ON f.mpa_id = m.id " +
+                    "WHERE fd.director_id = ? " +
+                    "GROUP BY f.film_id, m.name " +
+                    "ORDER BY COUNT(l.user_id) DESC";
+        }
+
+        return jdbc.query(sql, mapper, directorId);
     }
 
     private long insert(String query, Object... params) {
@@ -180,9 +199,7 @@ public class FilmDbStorage implements FilmStorage {
             }
             return ps;
         }, keyHolder);
-
         Long id = keyHolder.getKeyAs(Long.class);
-
         if (id != null) {
             return id;
         } else {
@@ -211,30 +228,23 @@ public class FilmDbStorage implements FilmStorage {
         if (film.getGenres() == null || film.getGenres().isEmpty()) {
             return;
         }
-
         String sql = "INSERT INTO film_genre(film_id, genre_id) VALUES (?, ?)";
-
         List<Object[]> batchArgs = film.getGenres().stream()
                 .map(genre -> new Object[]{film.getId(), genre.getId()})
                 .collect(Collectors.toList());
-
         jdbc.batchUpdate(sql, batchArgs);
     }
 
     private void updateGenres(Film film) {
         String deleteSql = "DELETE FROM film_genre WHERE film_id = ?";
         jdbc.update(deleteSql, film.getId());
-
         if (film.getGenres() == null || film.getGenres().isEmpty()) {
             return;
         }
-
         String sql = "INSERT INTO film_genre(film_id, genre_id) VALUES (?, ?)";
-
         List<Object[]> batchArgs = film.getGenres().stream()
                 .map(genre -> new Object[]{film.getId(), genre.getId()})
                 .collect(Collectors.toList());
-
         jdbc.batchUpdate(sql, batchArgs);
     }
 }
