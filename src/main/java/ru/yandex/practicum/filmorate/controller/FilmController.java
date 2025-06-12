@@ -3,7 +3,9 @@ package ru.yandex.practicum.filmorate.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.dto.NewFilmRequest;
 import ru.yandex.practicum.filmorate.dto.UpdateFilmRequest;
@@ -38,7 +40,10 @@ public class FilmController {
     }
 
     @PutMapping
-    public FilmDto update(@Valid @RequestBody UpdateFilmRequest film) {
+    public FilmDto update(@RequestBody(required = false) UpdateFilmRequest film) {
+        if (film == null) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Тело запроса не может быть пустым");
+        }
         return filmService.update(film);
     }
 
