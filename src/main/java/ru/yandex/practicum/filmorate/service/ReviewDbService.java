@@ -50,14 +50,14 @@ public class ReviewDbService {
             Review review = reviewDbStorage.createReview(reviewMapper.mapFromCreateDto(reviewDto));
             return reviewMapper.mapToDto(review);
         } catch (DataIntegrityViolationException e) {
-            throw new IllegalStateException("Неверные данные");
+            throw new NotFoundException("Неверные данные");
         }
 
     }
 
     public ReviewDto updateReview(UpdateReviewDto reviewDto) {
-        Review oldReview = reviewDbStorage.getReview(reviewDto.getId())
-                .orElseThrow(() -> new NotFoundException("Отзыв с id: " + reviewDto.getId() + "не найден"));
+        Review oldReview = reviewDbStorage.getReview(reviewDto.getReviewId())
+                .orElseThrow(() -> new NotFoundException("Отзыв с id: " + reviewDto.getReviewId() + "не найден"));
         if (reviewDto.getUserId() != null && !oldReview.getUserId().equals(reviewDto.getUserId())) {
             if (!userDbStorage.exists(reviewDto.getUserId())) {
                 throw new NotFoundException("Неверно задан id пользователя");
@@ -85,7 +85,7 @@ public class ReviewDbService {
 
     public void addLike(Long reviewId, Long userId) {
         if (reviewDbStorage.existsDislike(reviewId, userId)) {
-            throw new IllegalStateException("Пользователь уже поставил дизлайк этому отзыву");
+            removeDislike(reviewId, userId);
         }
         try {
             reviewDbStorage.addLike(reviewId, userId);
@@ -100,8 +100,9 @@ public class ReviewDbService {
     }
 
     public void addDislike(Long reviewId, Long userId) {
+
         if (reviewDbStorage.existsLike(reviewId, userId)) {
-            throw new IllegalStateException("Пользователь уже поставил лайк этому отзыву");
+            removeLike(reviewId, userId);
         }
         try {
             reviewDbStorage.addDislike(reviewId, userId);

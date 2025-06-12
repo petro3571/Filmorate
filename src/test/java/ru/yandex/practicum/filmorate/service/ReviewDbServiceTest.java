@@ -60,18 +60,18 @@ class ReviewDbServiceTest {
         newReviewDto.setUserId(1L);
         newReviewDto.setFilmId(10L);
         newReviewDto.setContent("content");
-        newReviewDto.setPositive(true);
+        newReviewDto.setIsPositive(true);
 
         ReviewDto reviewDto = new ReviewDto();
         reviewDto.setUserId(1L);
         reviewDto.setFilmId(10L);
         reviewDto.setContent("content");
-        reviewDto.setPositive(true);
+        reviewDto.setIsPositive(true);
 
         ReviewDto addedReview = service.createReview(newReviewDto);
         assertNotNull(addedReview);
         assertEquals(addedReview.getFilmId(), reviewDto.getFilmId());
-        assertEquals(service.getReview(addedReview.getId()), addedReview);
+        assertEquals(service.getReview(addedReview.getReviewId()), addedReview);
 
         assertThrows(NotFoundException.class, () -> service.getReview(11L)); // поиск по не сущ. id
 
@@ -79,23 +79,29 @@ class ReviewDbServiceTest {
         incorrectReviewDto.setUserId(20L); // ставим id, который не существует
         incorrectReviewDto.setFilmId(10L);
         incorrectReviewDto.setContent("content");
-        incorrectReviewDto.setPositive(false);
+        incorrectReviewDto.setIsPositive(false);
 
-        assertThrows(IllegalStateException.class, () -> service.createReview(incorrectReviewDto));
+        assertThrows(NotFoundException.class, () -> service.createReview(incorrectReviewDto));
 
         NewReviewDto secondReviewDto = new NewReviewDto();
         secondReviewDto.setUserId(1L);
         secondReviewDto.setFilmId(10L);
         secondReviewDto.setContent("new content");
-        secondReviewDto.setPositive(false);
-        assertThrows(IllegalStateException.class, () -> service.createReview(secondReviewDto));
+        secondReviewDto.setIsPositive(false);
+        assertThrows(NotFoundException.class, () -> service.createReview(secondReviewDto));
+
+        NewReviewDto reviewWithoutContent = new NewReviewDto();
+        reviewWithoutContent.setUserId(3L);
+        reviewWithoutContent.setFilmId(10L);
+        reviewWithoutContent.setIsPositive(false);
+        assertThrows(NotFoundException.class, () -> service.createReview(reviewWithoutContent));
     }
 
     @Test
     void updateReview() {
         ReviewDto dto = service.getReview(1L);
         UpdateReviewDto updateDto = new UpdateReviewDto();
-        updateDto.setId(dto.getId());
+        updateDto.setReviewId(dto.getReviewId());
         updateDto.setUserId(2L);
         updateDto.setFilmId(10L);
         updateDto.setContent("updated content");
@@ -131,7 +137,6 @@ class ReviewDbServiceTest {
         assertEquals(0, service.getReview(3L).getUseful());
 
         //если пользователь уже ставил лайк или дизайк этому фильму:
-        assertThrows(IllegalStateException.class, () -> service.addLike(1L, 5L));
         assertThrows(IllegalStateException.class, () -> service.addDislike(1L, 5L));
     }
 }

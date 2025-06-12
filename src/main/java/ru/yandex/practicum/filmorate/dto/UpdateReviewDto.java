@@ -11,7 +11,7 @@ import lombok.Data;
 public class UpdateReviewDto {
     @Id
     @NotNull
-    private Long id;
+    private Long reviewId;
 
     @Nullable
     @Size(max = 200, message = "Описание не должно превышать 200 символов.")

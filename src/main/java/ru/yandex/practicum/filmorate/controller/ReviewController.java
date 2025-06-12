@@ -1,7 +1,9 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.dto.NewReviewDto;
 import ru.yandex.practicum.filmorate.dto.ReviewDto;
@@ -13,6 +15,7 @@ import java.util.Collection;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/reviews")
+@Validated
 public class ReviewController {
 
     private final ReviewDbService reviewDbService;
@@ -30,7 +33,7 @@ public class ReviewController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ReviewDto createReview(@RequestBody NewReviewDto reviewDto) {
+    public ReviewDto createReview(@RequestBody @Valid NewReviewDto reviewDto) {
         return reviewDbService.createReview(reviewDto);
     }
 
@@ -40,7 +43,7 @@ public class ReviewController {
     }
 
     @PutMapping
-    public ReviewDto updateReview(@RequestBody UpdateReviewDto reviewDto) {
+    public ReviewDto updateReview(@RequestBody @Valid UpdateReviewDto reviewDto) {
         return reviewDbService.updateReview(reviewDto);
     }
 
