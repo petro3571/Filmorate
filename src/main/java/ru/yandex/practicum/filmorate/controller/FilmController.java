@@ -15,6 +15,7 @@ import ru.yandex.practicum.filmorate.service.FilmDbService;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -76,14 +77,23 @@ public class FilmController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Параметр query не может быть пустым");
         }
 
-        List<String> searchBy = Arrays.asList(by.split(","));
+        List<String> validByValues = List.of("title", "director");
+        List<String> searchBy = Arrays.stream(by.split(","))
+                .map(String::trim)
+                .filter(validByValues::contains)
+                .distinct()
+                .collect(Collectors.toList());
+
+        if (searchBy.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Параметр by должен содержать title или director");
+        }
+
         return filmService.searchFilms(query, searchBy);
     }
 
     @GetMapping("/director/{directorId}")
     public Collection<Film> getFilmsByDirector(@PathVariable Long directorId,
                                                @RequestParam(defaultValue = "likes") String sortBy) {
-        // Исправлено: добавлен новый метод в сервис
         return filmService.getFilmsByDirector(directorId, sortBy);
     }
 }

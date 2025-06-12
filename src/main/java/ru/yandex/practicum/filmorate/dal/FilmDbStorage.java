@@ -96,6 +96,7 @@ public class FilmDbStorage implements FilmStorage {
         );
         film.setId(id);
         saveGenres(film);
+        saveDirectors(film);
         return getFilm(id).orElseThrow(() -> new IllegalStateException("Не сохранен фильм с Id " + id));
     }
 
@@ -111,6 +112,7 @@ public class FilmDbStorage implements FilmStorage {
                 film.getId()
         );
         updateGenres(film);
+        updateDirectors(film);
         return getFilm(film.getId()).orElseThrow(() -> new IllegalStateException("Не удалось обновить фильм с Id " + film.getId()));
     }
 
@@ -244,6 +246,30 @@ public class FilmDbStorage implements FilmStorage {
         String sql = "INSERT INTO film_genre(film_id, genre_id) VALUES (?, ?)";
         List<Object[]> batchArgs = film.getGenres().stream()
                 .map(genre -> new Object[]{film.getId(), genre.getId()})
+                .collect(Collectors.toList());
+        jdbc.batchUpdate(sql, batchArgs);
+    }
+
+    private void saveDirectors(Film film) {
+        if (film.getDirectors() == null || film.getDirectors().isEmpty()) {
+            return;
+        }
+        String sql = "INSERT INTO film_director(film_id, director_id) VALUES (?, ?)";
+        List<Object[]> batchArgs = film.getDirectors().stream()
+                .map(director -> new Object[]{film.getId(), director.getId()})
+                .collect(Collectors.toList());
+        jdbc.batchUpdate(sql, batchArgs);
+    }
+
+    private void updateDirectors(Film film) {
+        String deleteSql = "DELETE FROM film_director WHERE film_id = ?";
+        jdbc.update(deleteSql, film.getId());
+        if (film.getDirectors() == null || film.getDirectors().isEmpty()) {
+            return;
+        }
+        String sql = "INSERT INTO film_director(film_id, director_id) VALUES (?, ?)";
+        List<Object[]> batchArgs = film.getDirectors().stream()
+                .map(director -> new Object[]{film.getId(), director.getId()})
                 .collect(Collectors.toList());
         jdbc.batchUpdate(sql, batchArgs);
     }

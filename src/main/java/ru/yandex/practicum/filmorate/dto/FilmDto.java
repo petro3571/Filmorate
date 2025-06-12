@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -33,7 +34,7 @@ public class FilmDto {
 
     private Mpa mpa;
 
-    private Set<Genre> genres;
+    private Set<Genre> genres = new HashSet<>();
 
-    private Set<Director> directors;
+    private Set<Director> directors = new HashSet<>();
 }

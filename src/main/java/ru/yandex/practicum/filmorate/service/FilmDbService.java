@@ -26,7 +26,7 @@ public class FilmDbService {
     private final MpaStorage mpaDbStorage;
     private final UserStorage userDbStorage;
     private final DirectorStorage directorStorage;
-    private DirectorService directorService;
+    private final DirectorService directorService;
 
     public Collection<FilmDto> getAll() {
         Collection<Film> films = filmDbStorage.getAll();
@@ -74,6 +74,14 @@ public class FilmDbService {
             }
         }
 
+        if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
+            for (Director director : film.getDirectors()) {
+                if (!directorStorage.getDirector(director.getId()).isPresent()) {
+                    throw new NotFoundException("Режиссёра с id " + director.getId() + " нет.");
+                }
+            }
+        }
+
         film = filmDbStorage.create(film);
 
         film.setGenres(genreDbStorage.getFilmGenres(film.getId()));
@@ -97,6 +105,14 @@ public class FilmDbService {
             for (Genre genre : updateFilm.getGenres()) {
                 if (!genreDbStorage.getGenre(genre.getId()).isPresent()) {
                     throw new NotFoundException("Жанра с id " + genre.getId() + " нет.");
+                }
+            }
+        }
+
+        if (updateFilm.getDirectors() != null && !updateFilm.getDirectors().isEmpty()) {
+            for (Director director : updateFilm.getDirectors()) {
+                if (!directorStorage.getDirector(director.getId()).isPresent()) {
+                    throw new NotFoundException("Режиссёра с id " + director.getId() + " нет.");
                 }
             }
         }

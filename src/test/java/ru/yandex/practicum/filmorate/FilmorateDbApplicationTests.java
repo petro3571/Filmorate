@@ -6,8 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
-import ru.yandex.practicum.filmorate.dal.GenreDbStorage;
-import ru.yandex.practicum.filmorate.dal.MpaDbStorage;
+import ru.yandex.practicum.filmorate.dal.*;
 import ru.yandex.practicum.filmorate.dal.mapper.FilmRowMapper;
 import ru.yandex.practicum.filmorate.dal.mapper.GenreRowMapper;
 import ru.yandex.practicum.filmorate.dal.mapper.MpaRowMapper;
@@ -16,8 +15,6 @@ import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.dal.FilmDbStorage;
-import ru.yandex.practicum.filmorate.dal.UserDbStorage;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -27,10 +24,11 @@ import static org.junit.jupiter.api.Assertions.*;
 @JdbcTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-@Import({UserDbStorage.class, FilmDbStorage.class, GenreDbStorage.class, MpaDbStorage.class, UserRowMapper.class, FilmRowMapper.class, GenreRowMapper.class, MpaRowMapper.class})
+@Import({UserDbStorage.class, FilmDbStorage.class, GenreDbStorage.class, DirectorDbStorage.class, MpaDbStorage.class, UserRowMapper.class, FilmRowMapper.class, GenreRowMapper.class, MpaRowMapper.class})
 class FilmorateDbApplicationTests {
     private final UserDbStorage userDbStorage;
     private final FilmDbStorage filmDbStorage;
+    private final DirectorDbStorage directorDbStorage;
 
     private User testUser;
     private Film testFilm;
@@ -116,9 +114,10 @@ class FilmorateDbApplicationTests {
         testFilm.setMpa(new Mpa(1, null));
 
         Director director = new Director();
-        director.setId(1L);
         director.setName("Test Director");
-        testFilm.setDirectors(Set.of(director));
+        Director createdDirector = directorDbStorage.create(director);
+
+        testFilm.setDirectors(Set.of(createdDirector));
 
         User createdUser = userDbStorage.saveUser(testUser);
 
