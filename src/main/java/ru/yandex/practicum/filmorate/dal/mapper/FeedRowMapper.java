@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.model.Feed;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.time.LocalDate;
 
 @Component
@@ -13,13 +14,12 @@ public class FeedRowMapper implements RowMapper<Feed> {
     @Override
     public Feed mapRow(ResultSet rs, int rowNum) throws SQLException {
         Feed feed = new Feed();
-        feed.setId(rs.getLong("event_id"));
+        feed.setEventId(rs.getLong("event_id"));
         feed.setUserId(rs.getLong("user_id"));
-        LocalDate newLocalDate = rs.getDate("event_date").toLocalDate();
-        feed.setEventDate(newLocalDate);
+        feed.setTimestamp(rs.getLong("timestamp"));
         feed.setEntityId(rs.getInt("entity_id"));
         feed.setEventType(rs.getString("event_type"));
-        feed.setEventOperation(rs.getString("event_operation"));
+        feed.setOperation(rs.getString("event_operation"));
 
         return feed;
     }

@@ -14,7 +14,7 @@ import java.util.Collection;
 @RequiredArgsConstructor
 @Qualifier("feedDbStorage")
 public class FeedDbStorage implements FeedStorage {
-    private static final String QUERY = "SELECT f.event_id,f.user_id,f.event_date,f.entity_id, et.name as event_type, " +
+    private static final String QUERY = "SELECT f.event_id,f.user_id,f.timestamp,f.entity_id, et.name as event_type, " +
             "o.name as event_operation FROM feeds f join event_type as et on f.event_type_id = et.id join operations " +
             "as o on f.event_operation_id = o.id WHERE f.user_id = ?";
 

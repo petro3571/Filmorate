@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS friends (
 CREATE TABLE IF NOT EXISTS feeds (
             event_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
             user_id INTEGER REFERENCES users ON DELETE CASCADE,
-            event_date DATE NOT NULL,
+            timestamp BIGINT NOT NULL,
             entity_id INTEGER NOT NULL,
             event_type_id INTEGER REFERENCES event_type ON DELETE CASCADE,
             event_operation_id INTEGER REFERENCES operations ON DELETE CASCADE

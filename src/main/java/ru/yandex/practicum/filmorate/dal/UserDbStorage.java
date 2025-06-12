@@ -14,6 +14,7 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -107,8 +108,8 @@ public class UserDbStorage implements UserStorage {
         List<Integer> entityIds = jdbc.queryForList(queryForEntityId,Integer.class, userId, friendId);
 
         if (!entityIds.isEmpty()) {
-            String feedquery = "INSERT INTO feeds (user_id, event_date, entity_id, event_type_id, event_operation_id) VALUES (?,?,?,?,?)";
-            update(feedquery, userId, LocalDateTime.now(), entityIds.get(0), 3, 2);
+            String feedquery = "INSERT INTO feeds (user_id, timestamp, entity_id, event_type_id, event_operation_id) VALUES (?,?,?,?,?)";
+            update(feedquery, userId, Instant.now().toEpochMilli(), entityIds.get(0), 3, 2);
         }
     }
 
@@ -124,8 +125,8 @@ public class UserDbStorage implements UserStorage {
         List<Integer> entityIds = jdbc.queryForList(queryForEntityId,Integer.class, userId, friendId);
 
         if (!entityIds.isEmpty()) {
-            String feedQuery = "INSERT INTO feeds (user_id, event_date, entity_id, event_type_id, event_operation_id) VALUES (?,?,?,?,?)";
-            update(feedQuery, userId, LocalDate.now(), entityIds.get(0), 3, 3);
+            String feedQuery = "INSERT INTO feeds (user_id, timestamp, entity_id, event_type_id, event_operation_id) VALUES (?,?,?,?,?)";
+            update(feedQuery, userId, Instant.now().toEpochMilli(), entityIds.get(0), 3, 3);
         }
     }
 
@@ -146,8 +147,8 @@ public class UserDbStorage implements UserStorage {
         List<Integer> entityIds = jdbc.queryForList(queryForEntityId,Integer.class, userId, friendId);
 
         if (!entityIds.isEmpty()) {
-            String feedQuery = "INSERT INTO feeds (user_id, event_date, entity_id, event_type_id, event_operation_id) VALUES (?,?,?,?,?)";
-            update(feedQuery, userId, LocalDate.now(), entityIds.get(0), 3, 1);
+            String feedQuery = "INSERT INTO feeds (user_id, timestamp, entity_id, event_type_id, event_operation_id) VALUES (?,?,?,?,?)";
+            update(feedQuery, userId, Instant.now().toEpochMilli(), entityIds.get(0), 3, 1);
         }
 
         String query = "DELETE FROM friends WHERE user_id = ? AND friend_id = ?";

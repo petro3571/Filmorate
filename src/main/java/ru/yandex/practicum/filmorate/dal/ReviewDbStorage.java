@@ -12,7 +12,10 @@ import ru.yandex.practicum.filmorate.model.Review;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -67,6 +70,11 @@ public class ReviewDbStorage {
                 review.isPositive(),
                 review.getContent());
         review.setId(id);
+
+        String feedQuery = "INSERT INTO feeds (user_id, timestamp, entity_id, event_type_id, event_operation_id) " +
+                "VALUES (?,?,?,?,?)";
+        update(feedQuery, review.getUserId(), Instant.now().toEpochMilli(), review.getId(), 2, 2);
+
         return review;
     }
 
@@ -115,11 +123,26 @@ public class ReviewDbStorage {
     }
 
     public Review updateReview(Review review) {
-        update(UPDATE_QUERY, review.getUserId(), review.getFilmId(), review.isPositive(), review.getContent(), review.getId());
+        update(UPDATE_QUERY, review.getUserId(), review.getFilmId(), review.isPositive(), review.getContent(),
+                review.getId());
+
+        String feedQuery = "INSERT INTO feeds (user_id, timestamp, entity_id, event_type_id, event_operation_id) " +
+                "VALUES (?,?,?,?,?)";
+        update(feedQuery, review.getUserId(), Instant.now().toEpochMilli(), review.getId(), 2, 3);
+
         return review;
     }
 
     public void delete(Long reviewId) {
+        Optional<Review> review = getReview(reviewId);
+
+        if (review.isPresent()) {
+            Review findReview = review.get();
+            String feedQuery = "INSERT INTO feeds (user_id, timestamp, entity_id, event_type_id, event_operation_id) " +
+                    "VALUES (?,?,?,?,?)";
+            update(feedQuery, findReview.getUserId(), Instant.now().toEpochMilli(), findReview.getId(), 2, 1);
+        }
+
         delete(DELETE_QUERY, reviewId);
     }
 

@@ -14,6 +14,7 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.Collection;
@@ -112,8 +113,8 @@ public class FilmDbStorage implements FilmStorage {
         List<Integer> entityIds = jdbc.queryForList(queryForEntityId,Integer.class, filmId, userId);
 
         if (!entityIds.isEmpty()) {
-            String feedquery = "INSERT INTO feeds (user_id, event_date, entity_id, event_type_id, event_operation_id) VALUES (?,?,?,?,?)";
-            update(feedquery, userId, LocalDateTime.now(), entityIds.get(0), 1, 2);
+            String feedquery = "INSERT INTO feeds (user_id, timestamp, entity_id, event_type_id, event_operation_id) VALUES (?,?,?,?,?)";
+            update(feedquery, userId, Instant.now().toEpochMilli(), entityIds.get(0), 1, 2);
         }
     }
 
@@ -125,8 +126,8 @@ public class FilmDbStorage implements FilmStorage {
         List<Integer> entityIds = jdbc.queryForList(queryForEntityId,Integer.class, filmId, userId);
 
         if (!entityIds.isEmpty()) {
-            String feedQuery = "INSERT INTO feeds (user_id, event_date, entity_id, event_type_id, event_operation_id) VALUES (?,?,?,?,?)";
-            update(feedQuery, userId, LocalDateTime.now(), entityIds.get(0), 1, 1);
+            String feedQuery = "INSERT INTO feeds (user_id, timestamp, entity_id, event_type_id, event_operation_id) VALUES (?,?,?,?,?)";
+            update(feedQuery, userId, Instant.now().toEpochMilli(), entityIds.get(0), 1, 1);
         }
 
         jdbc.update(DELETE_LIKE_QUERY, filmId, userId);
