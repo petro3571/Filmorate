@@ -31,10 +31,8 @@ public class UserDbStorage implements UserStorage {
     private static final String UPDATE_QUERY = "UPDATE users SET name = ?, email = ?, login = ?, birthday = ? " +
             "WHERE user_id = ?";
     private static final String DELETE_QUERY = "DELETE FROM users WHERE user_id = ?";
-    private static final String FIND_ALL_QUERY = "SELECT user_id AS id, name AS username, email, login, birthday " +
-            "FROM users";
-    private static final String FIND_BY_ID_QUERY = "SELECT user_id AS id, name AS username, email, login, birthday " +
-            "FROM users WHERE user_id = ?";
+    private static final String FIND_ALL_QUERY = "SELECT user_id as id, name, email, login, birthday FROM users";
+    private static final String FIND_BY_ID_QUERY = "SELECT user_id as id, name, email, login, birthday FROM users WHERE user_id = ?";
     private static final String FIND_BY_EMAIL_QUERY = "SELECT user_id AS id, name AS username, email, login, birthday " +
             "FROM users WHERE email = ?";
     private final JdbcTemplate jdbc;

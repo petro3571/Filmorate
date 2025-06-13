@@ -23,13 +23,11 @@ import java.util.stream.Collectors;
 public class FilmDbStorage implements FilmStorage {
     private static final String INSERT_QUERY = "INSERT INTO films(title, description, release_date, duration, MPA_id) " +
             "VALUES (?, ?, ?, ?, ?)";
-    private static final String FIND_ALL_QUERY = "SELECT f.film_id, f.title, f.description, f.release_date, " +
-            "f.duration, f.mpa_id, m.name FROM films AS f LEFT JOIN mpa AS m ON f.MPA_id = m.id";
+    private static final String FIND_ALL_QUERY = "SELECT film_id as id, title as name, description, release_date, duration, mpa_id, m.name as mpa_name FROM films f LEFT JOIN mpa m ON f.mpa_id = m.id";
     private static final String UPDATE_QUERY = "UPDATE films SET title = ?, description = ?, release_date = ?, " +
             "duration = ?, mpa_id = ? WHERE film_id = ?";
     private static final String DELETE_QUERY = "DELETE FROM films WHERE film_id = ?";
-    private static final String NEWFIND = "SELECT f.film_id, f.title, f.description, f.release_date, f.duration, " +
-            "f.mpa_id, m.name FROM films AS f LEFT JOIN mpa AS m ON f.MPA_id = m.id WHERE f.film_id = ?";
+    private static final String NEWFIND = "SELECT film_id as id, title as name, description, release_date, duration, mpa_id, m.name as mpa_name FROM films f LEFT JOIN mpa m ON f.mpa_id = m.id WHERE film_id = ?";
     private static final String LIKE_QUERY = "INSERT INTO likes(film_id, user_id) VALUES(?, ?)";
     private static final String DELETE_LIKE_QUERY = "DELETE FROM likes WHERE film_id = ? AND user_id = ?";
     private static final String POPULAR_QUERY = "SELECT f.film_id, f.title, f.description, f.release_date, f.duration, " +

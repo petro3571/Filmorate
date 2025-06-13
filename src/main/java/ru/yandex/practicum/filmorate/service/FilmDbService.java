@@ -30,9 +30,8 @@ public class FilmDbService {
 
     public Collection<FilmDto> getAll() {
         Collection<Film> films = filmDbStorage.getAll();
-
         if (films.isEmpty()) {
-            throw new NotFoundException("Фильмы не найдены.");
+            return Collections.emptyList();
         }
 
         List<Long> listFilmIds = films.stream().map(Film::getId).collect(Collectors.toList());
@@ -151,9 +150,8 @@ public class FilmDbService {
 
     public Collection<Film> getPopularFilms(Integer count) {
         Collection<Film> popularFilms = filmDbStorage.getPopularFilms(count);
-
         if (popularFilms.isEmpty()) {
-            throw new NotFoundException("Фильмы не найдены.");
+            return Collections.emptyList();
         }
 
         List<Long> listFilmIds = popularFilms.stream().map(Film::getId).collect(Collectors.toList());
