@@ -30,7 +30,7 @@ public class DirectorService {
     }
 
     public Director update(Director director) {
-        getById(director.getId()); // проверяем существование
+        getById(director.getId());
         if (director.getName() == null || director.getName().trim().isEmpty()) {
             throw new IllegalArgumentException("Имя режиссёра не может быть пустым или состоять только из пробелов");
         }
