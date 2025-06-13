@@ -18,7 +18,7 @@ public class DirectorDbStorage implements DirectorStorage {
 
     @Override
     public List<Director> getAll() {
-        String sql = "SELECT director_id AS id, name FROM directors";
+        String sql = "SELECT id, name FROM directors";
         return jdbc.query(sql, (rs, rowNum) -> {
             Director director = new Director();
             director.setId(rs.getLong("id"));
