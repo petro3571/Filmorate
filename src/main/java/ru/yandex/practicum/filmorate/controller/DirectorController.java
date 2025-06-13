@@ -3,6 +3,8 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.service.DirectorService;
 
@@ -22,23 +24,41 @@ public class DirectorController {
 
     @GetMapping("/{id}")
     public Director getById(@PathVariable Long id) {
-        return directorService.getById(id);
+        try {
+            return directorService.getById(id);
+        } catch (NotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Director create(@RequestBody Director director) {
-        return directorService.create(director);
+        try {
+            return directorService.create(director);
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
     }
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
     public Director update(@RequestBody Director director) {
-        return directorService.update(director);
+        try {
+            return directorService.update(director);
+        } catch (NotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
     }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
-        directorService.delete(id);
+        try {
+            directorService.delete(id);
+        } catch (NotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
     }
 }

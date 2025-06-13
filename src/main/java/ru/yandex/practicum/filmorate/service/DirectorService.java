@@ -23,11 +23,17 @@ public class DirectorService {
     }
 
     public Director create(Director director) {
+        if (director.getName() == null || director.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Имя режиссёра не может быть пустым или состоять только из пробелов");
+        }
         return directorStorage.create(director);
     }
 
     public Director update(Director director) {
         getById(director.getId()); // проверяем существование
+        if (director.getName() == null || director.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Имя режиссёра не может быть пустым или состоять только из пробелов");
+        }
         return directorStorage.update(director);
     }
 

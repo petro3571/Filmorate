@@ -94,6 +94,9 @@ public class FilmController {
     @GetMapping("/director/{directorId}")
     public Collection<Film> getFilmsByDirector(@PathVariable Long directorId,
                                                @RequestParam(defaultValue = "likes") String sortBy) {
+        if (!sortBy.equals("likes") && !sortBy.equals("year")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "sortBy должен быть likes или year");
+        }
         return filmService.getFilmsByDirector(directorId, sortBy);
     }
 }
