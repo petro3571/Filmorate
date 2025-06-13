@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +30,7 @@ public class DirectorController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Director create(@RequestBody Director director) {
+    public Director create(@Valid @RequestBody Director director) {
         try {
             return directorService.create(director);
         } catch (IllegalArgumentException e) {
@@ -39,7 +40,7 @@ public class DirectorController {
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
-    public Director update(@RequestBody Director director) {
+    public Director update(@Valid @RequestBody Director director) {
         try {
             return directorService.update(director);
         } catch (NotFoundException e) {
