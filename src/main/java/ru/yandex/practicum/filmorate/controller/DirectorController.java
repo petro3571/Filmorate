@@ -24,11 +24,7 @@ public class DirectorController {
 
     @GetMapping("/{id}")
     public Director getById(@PathVariable Long id) {
-        try {
-            return directorService.getById(id);
-        } catch (NotFoundException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-        }
+        return directorService.getById(id);
     }
 
     @PostMapping
