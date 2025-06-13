@@ -40,11 +40,9 @@ public class DirectorController {
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
-    public Director update(@Valid @RequestBody Director director) {
+    public Director update(@RequestBody Director director) {
         try {
             return directorService.update(director);
-        } catch (NotFoundException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
