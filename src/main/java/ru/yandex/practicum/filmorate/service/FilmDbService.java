@@ -80,6 +80,10 @@ public class FilmDbService {
                     throw new NotFoundException("Режиссёра с id " + director.getId() + " нет.");
                 }
             }
+            film = filmDbStorage.create(film);
+            film.setGenres(genreDbStorage.getFilmGenres(film.getId()));
+            film.setDirectors(directorStorage.getFilmDirectors(film.getId()));
+            return FilmMapper.mapToFilmDto(film);
         }
 
         film = filmDbStorage.create(film);

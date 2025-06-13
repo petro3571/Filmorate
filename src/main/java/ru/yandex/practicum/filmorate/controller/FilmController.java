@@ -36,15 +36,14 @@ public class FilmController {
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public FilmDto create(@Valid @RequestBody NewFilmRequest film) {
         return filmService.create(film);
     }
 
     @PutMapping
-    public FilmDto update(@RequestBody(required = false) UpdateFilmRequest film) {
-        if (film == null) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Тело запроса не может быть пустым");
-        }
+    @ResponseStatus(HttpStatus.OK)
+    public FilmDto update(@Valid @RequestBody UpdateFilmRequest film) {
         return filmService.update(film);
     }
 
