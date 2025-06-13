@@ -66,4 +66,5 @@ public class ReviewController {
     public void deleteDislike(@PathVariable Long id, @PathVariable Long userId) {
         reviewDbService.removeDislike(id, userId);
     }
+
 }
