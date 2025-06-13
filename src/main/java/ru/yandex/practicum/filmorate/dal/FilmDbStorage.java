@@ -43,7 +43,7 @@ public class FilmDbStorage implements FilmStorage {
             "LEFT JOIN film_director fd ON f.film_id = fd.film_id " +
             "LEFT JOIN directors d ON fd.director_id = d.id " +
             "WHERE (LOWER(f.title) LIKE LOWER(?) OR LOWER(d.name) LIKE LOWER(?)) " +
-            "GROUP BY f.film_id, m.name " +
+            "GROUP BY f.film_id, m.name, d.id " +
             "ORDER BY COUNT(l.user_id) DESC";
 
     private static final String SEARCH_BY_TITLE_AND_DIRECTOR = "SELECT f.film_id, f.title, f.description, f.release_date, f.duration, " +
@@ -53,7 +53,7 @@ public class FilmDbStorage implements FilmStorage {
             "LEFT JOIN film_director fd ON f.film_id = fd.film_id " +
             "LEFT JOIN directors d ON fd.director_id = d.id " +
             "WHERE (LOWER(f.title) LIKE LOWER(?) OR LOWER(d.name) LIKE LOWER(?)) " +
-            "GROUP BY f.film_id, m.name " +
+            "GROUP BY f.film_id, m.name, d.id " +
             "ORDER BY COUNT(l.user_id) DESC";
 
     private static final String SEARCH_BY_TITLE = "SELECT f.film_id, f.title, f.description, f.release_date, f.duration, " +
@@ -71,7 +71,7 @@ public class FilmDbStorage implements FilmStorage {
             "LEFT JOIN film_director fd ON f.film_id = fd.film_id " +
             "LEFT JOIN directors d ON fd.director_id = d.id " +
             "WHERE LOWER(d.name) LIKE LOWER(?) " +
-            "GROUP BY f.film_id, m.name " +
+            "GROUP BY f.film_id, m.name, d.id " +
             "ORDER BY COUNT(l.user_id) DESC";
 
     private final JdbcTemplate jdbc;
