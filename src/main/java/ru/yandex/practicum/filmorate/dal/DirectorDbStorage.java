@@ -18,7 +18,7 @@ public class DirectorDbStorage implements DirectorStorage {
 
     @Override
     public List<Director> getAll() {
-        String sql = "SELECT id, name FROM directors";
+        String sql = "SELECT director_id AS id, name FROM directors";
         return jdbc.query(sql, (rs, rowNum) -> {
             Director director = new Director();
             director.setId(rs.getLong("id"));
@@ -29,7 +29,7 @@ public class DirectorDbStorage implements DirectorStorage {
 
     @Override
     public Optional<Director> getDirector(Long id) {
-        String sql = "SELECT id, name FROM directors WHERE id = ?";
+        String sql = "SELECT director_id AS id, name FROM directors WHERE director_id = ?";
         try {
             Director director = jdbc.queryForObject(sql, (rs, rowNum) -> {
                 Director d = new Director();
@@ -59,21 +59,21 @@ public class DirectorDbStorage implements DirectorStorage {
 
     @Override
     public Director update(Director director) {
-        String sql = "UPDATE directors SET name = ? WHERE id = ?";
+        String sql = "UPDATE directors SET name = ? WHERE director_id = ?";
         jdbc.update(sql, director.getName(), director.getId());
         return director;
     }
 
     @Override
     public void delete(Long id) {
-        String sql = "DELETE FROM directors WHERE id = ?";
+        String sql = "DELETE FROM directors WHERE director_id = ?";
         jdbc.update(sql, id);
     }
 
     @Override
     public Set<Director> getFilmDirectors(Long filmId) {
-        String sql = "SELECT d.id, d.name FROM film_director fd " +
-                "JOIN directors d ON fd.director_id = d.id " +
+        String sql = "SELECT d.director_id AS id, d.name FROM film_director fd " +
+                "JOIN directors d ON fd.director_id = d.director_id " +
                 "WHERE fd.film_id = ?";
         return new HashSet<>(jdbc.query(sql, (rs, rowNum) -> {
             Director director = new Director();
@@ -89,9 +89,10 @@ public class DirectorDbStorage implements DirectorStorage {
             return Collections.emptyMap();
         }
 
-        String sql = "SELECT fd.film_id, d.id, d.name FROM film_director fd " +
-                "JOIN directors d ON fd.director_id = d.id " +
-                "WHERE fd.film_id IN (" + String.join(",", Collections.nCopies(filmIds.size(), "?")) + ")";
+        String inSql = String.join(",", Collections.nCopies(filmIds.size(), "?"));
+        String sql = "SELECT fd.film_id, d.director_id AS id, d.name FROM film_director fd " +
+                "JOIN directors d ON fd.director_id = d.director_id " +
+                "WHERE fd.film_id IN (" + inSql + ")";
 
         return jdbc.query(sql, filmIds.toArray(), rs -> {
             Map<Long, Set<Director>> result = new HashMap<>();
