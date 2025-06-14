@@ -136,13 +136,13 @@ public class FilmDbService {
     public void addLike(Long filmId, Long userId) {
         userDbStorage.existsUserById(userId);
         filmDbStorage.addLike(filmId, userId);
-        log.info("Пользователь с id " + userId + " поставил лайк фильму с id " + filmId + " .");
+        log.info("Пользователь с id {} поставил лайк фильму с id {} .", userId, filmId);
     }
 
     public void deleteLike(Long filmId, Long userId) {
         userDbStorage.existsUserById(userId);
         filmDbStorage.deleteLike(filmId, userId);
-        log.info("Пользователь с id " + userId + " удалил лайк фильму с id " + filmId + " .");
+        log.info("Пользователь с id {} удалил лайк фильму с id {} .", userId, filmId);
     }
 
     public Collection<FilmDto> getPopularFilms(Integer count, Integer genreId, Integer year) {

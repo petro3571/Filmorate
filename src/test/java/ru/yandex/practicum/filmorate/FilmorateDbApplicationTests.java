@@ -59,6 +59,15 @@ class FilmorateDbApplicationTests {
         assertNotNull(createdUser.getBirthday(), "Поле 'birthday' должно быть заполнено");
     }
 
+    /**
+     * Тест работы с пользователями:
+     * 1. Создание пользователя
+     * 2. Получение пользователя по ID
+     * 3. Получение всех пользователей
+     * 4. Обновление пользователя
+     * 5. Добавление и удаление друга
+     * Проверяет корректность выполнения всех операций
+     */
     @Test
     void shouldRunWorkWithUsers() {
         testUser = new User();
@@ -102,6 +111,15 @@ class FilmorateDbApplicationTests {
         assertEquals(0, newListFriends.size());
     }
 
+    /**
+     * Тест работы с фильмами:
+     * 1. Создание фильма с режиссером
+     * 2. Получение фильма по ID
+     * 3. Получение всех фильмов
+     * 4. Обновление фильма
+     * 5. Добавление лайка и получение популярных фильмов
+     * Проверяет корректность выполнения всех операций
+     */
     @Test
     void shouldRunWorkWithFilms() {
         testUser = new User();
@@ -164,6 +182,14 @@ class FilmorateDbApplicationTests {
         assertEquals(newFilm.getName(), "Test Film Name");
     }
 
+    /**
+     * Тест проверяет корректность получения популярных фильмов с различными параметрами:
+     * 1. Без фильтров (топ-10)
+     * 2. С фильтром по жанру
+     * 3. С фильтром по году выпуска
+     * 4. С фильтрами по жанру и году одновременно
+     * Использует SQL-скрипты для заполнения тестовых данных перед тестом и очистки после
+     */
     @Test
     @Sql(scripts = "/testdata.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "/cleanup.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
@@ -190,6 +216,11 @@ class FilmorateDbApplicationTests {
 
     }
 
+    /**
+     * Тест для проверки получения всех жанров
+     * Выводит список всех фильмов в консоль
+     * Использует SQL-скрипты для заполнения тестовых данных перед тестом и очистки после
+     */
     @Test
     @Sql(scripts = "/testdata.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "/cleanup.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
@@ -197,6 +228,12 @@ class FilmorateDbApplicationTests {
         System.out.println(filmDbService.getAll());
     }
 
+    /**
+     * Тест проверяет функциональность поиска фильмов:
+     * 1. Создает два тестовых фильма
+     * 2. Выполняет поиск по названию
+     * 3. Проверяет, что найден только один филь фильм с искомым словом в названии
+     */
     @Test
     void shouldSearchFilms() {
         Film film1 = new Film();

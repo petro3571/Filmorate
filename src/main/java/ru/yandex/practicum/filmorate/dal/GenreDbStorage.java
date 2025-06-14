@@ -24,11 +24,13 @@ public class GenreDbStorage implements GenreStorage {
     private final JdbcTemplate jdbc;
     private final GenreRowMapper mapper;
 
+    // Получение списка всех жанров из БД
     @Override
     public List<Genre> getAll() {
         return jdbc.query(FIND_ALL_QUERY, mapper);
     }
 
+    // Получение жанра по ID
     @Override
     public Optional<Genre> getGenre(Integer genreId) {
         try {
@@ -39,12 +41,14 @@ public class GenreDbStorage implements GenreStorage {
         }
     }
 
+    // Получение жанров конкретного фильма, отсортированных по ID
     @Override
     public TreeSet<Genre> getFilmGenres(Long filmId) {
         return jdbc.query(FIND_FILM_GENRES, mapper, filmId).stream().sorted(Comparator.comparingInt(Genre::getId))
                 .collect(Collectors.toCollection(TreeSet::new));
     }
 
+    // Получение жанров для списка фильмов
     @Override
     public Map<Long, TreeSet<Genre>> getGenresForFilms(List<Long> filmIds) {
         String sql = "SELECT fg.film_id, g.id, g.name FROM film_genre fg " +

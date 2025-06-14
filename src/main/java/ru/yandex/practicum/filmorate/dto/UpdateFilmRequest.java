@@ -61,7 +61,4 @@ public class UpdateFilmRequest {
         return !(mpa == null);
     }
 
-    public boolean hasGenres() {
-        return genres != null && !genres.isEmpty();
-    }
 }

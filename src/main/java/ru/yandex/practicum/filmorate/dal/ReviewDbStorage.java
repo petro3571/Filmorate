@@ -52,6 +52,7 @@ public class ReviewDbStorage {
     @Autowired
     private final ReviewRowMapper reviewRowMapper;
 
+    // Создание нового отзыва + запись в ленту событий
     public Review createReview(Review review) {
 
         long id = insert(INSERT_QUERY,
@@ -84,6 +85,7 @@ public class ReviewDbStorage {
         jdbcTemplate.update(DELETE_DISLIKE_QUERY, reviewId, userId);
     }
 
+    // Проверка лайка
     public boolean existsLike(Long reviewId, Long userId) {
         try {
             Integer result = jdbcTemplate.queryForObject(
@@ -98,6 +100,7 @@ public class ReviewDbStorage {
         }
     }
 
+    // Проверка дизлайка
     public boolean existsDislike(Long reviewId, Long userId) {
         try {
             Integer result = jdbcTemplate.queryForObject(
@@ -112,6 +115,7 @@ public class ReviewDbStorage {
         }
     }
 
+    // Обновление отзыва + запись в ленту событий
     public Review updateReview(Review review) {
         update(UPDATE_QUERY, review.getUserId(), review.getFilmId(), review.isPositive(), review.getContent(),
                 review.getId());
@@ -123,6 +127,7 @@ public class ReviewDbStorage {
         return review;
     }
 
+    // Удаление отзыва
     public void delete(Long reviewId) {
         Optional<Review> review = getReview(reviewId);
 
@@ -137,6 +142,7 @@ public class ReviewDbStorage {
     }
 
 
+    // Получение одного отзыва
     public Optional<Review> getReview(Long reviewId) {
         try {
             Review review = jdbcTemplate.queryForObject(SELECT_QUERY, reviewRowMapper, reviewId);
@@ -146,10 +152,12 @@ public class ReviewDbStorage {
         }
     }
 
+    // Все отзывы
     public Collection<Review> getAllReviews(int count) {
         return jdbcTemplate.query(SELECT_ALL_QUERY, reviewRowMapper, count);
     }
 
+    // Отзывы по фильму
     public Collection<Review> getAllReviewsByFilmId(Long filmId, int count) {
         return jdbcTemplate.query(SELECT_ALL_BY_FILM_ID_QUERY, reviewRowMapper, filmId, count);
     }
@@ -181,8 +189,7 @@ public class ReviewDbStorage {
         }
     }
 
-    private boolean delete(String query, long id) {
+    private void delete(String query, long id) {
         int rowsDeleted = jdbcTemplate.update(query, id);
-        return rowsDeleted > 0;
     }
 }

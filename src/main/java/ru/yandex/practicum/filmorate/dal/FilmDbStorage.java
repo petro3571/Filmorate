@@ -105,11 +105,13 @@ public class FilmDbStorage implements FilmStorage {
     private final JdbcTemplate jdbc;
     private final FilmRowMapper mapper;
 
+    // Получение всех фильмов из БД
     @Override
     public Collection<Film> getAll() {
         return jdbc.query(FIND_ALL_QUERY, mapper);
     }
 
+    // Создание нового фильма с сохранением в БД
     @Override
     public Film create(Film film) {
         long id = insert(
@@ -126,6 +128,7 @@ public class FilmDbStorage implements FilmStorage {
         return getFilm(id).orElseThrow(() -> new IllegalStateException("Не сохранен фильм с Id " + id));
     }
 
+    // Обновление данных фильма
     @Override
     public Film update(Film film) {
         update(
@@ -142,11 +145,13 @@ public class FilmDbStorage implements FilmStorage {
         return getFilm(film.getId()).orElseThrow(() -> new IllegalStateException("Не удалось обновить фильм с Id " + film.getId()));
     }
 
+    // Удаление фильма по ID
     @Override
     public void deleteFilm(Long filmId) {
         delete(DELETE_QUERY, filmId);
     }
 
+    // Получение фильма по ID
     @Override
     public Optional<Film> getFilm(Long filmId) {
         try {
@@ -157,6 +162,7 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
+    // Добавление лайка фильму от пользователя
     @Override
     public void addLike(Long filmId, Long userId) {
         existFilmById(filmId);
@@ -166,6 +172,7 @@ public class FilmDbStorage implements FilmStorage {
         update(feedquery, userId, Instant.now().toEpochMilli(), filmId, 1, 2);
     }
 
+    // Удаление лайка у фильма
     @Override
     public void deleteLike(Long filmId, Long userId) {
         existFilmById(filmId);
@@ -176,11 +183,13 @@ public class FilmDbStorage implements FilmStorage {
         jdbc.update(DELETE_LIKE_QUERY, filmId, userId);
     }
 
+    // Получение списка популярных фильмов
     @Override
     public Collection<Film> getPopularFilms(Integer count) {
         return jdbc.query(POPULAR_QUERY, mapper, count);
     }
 
+    // Проверка существования фильма
     public boolean exists(Long filmId) {
         try {
             Integer result = jdbc.queryForObject(
@@ -194,6 +203,7 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
+    // Поиск фильмов по названию и/или режиссеру
     @Override
     public Collection<Film> searchFilms(String query, List<String> by) {
         String searchPattern = "%" + query.toLowerCase() + "%";
@@ -213,6 +223,7 @@ public class FilmDbStorage implements FilmStorage {
         return Collections.emptyList();
     }
 
+    // Получение фильмов режиссера с сортировкой по году или популярности
     @Override
     public Collection<Film> getFilmsByDirector(Long directorId, String sortBy) {
         String sql;
@@ -252,11 +263,13 @@ public class FilmDbStorage implements FilmStorage {
         return jdbc.query(POPULAR_QUERY_BY_GENRE_AND_YEAR, mapper, genre, year, count);
     }
 
+    // Получение общих фильмов двух пользователей
     @Override
     public Collection<Film> getCommonFilms(Long userId, Long friendId) {
         return jdbc.query(COMMON_FILMS, mapper, userId, friendId);
     }
 
+    // Вставка данных с возвратом сгенерированного ID
     private long insert(String query, Object... params) {
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(connection -> {
@@ -275,6 +288,7 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
+    // Обновление данных
     private void update(String query, Object... params) {
         int rowsUpdated = jdbc.update(query, params);
         if (rowsUpdated == 0) {
@@ -282,16 +296,18 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
-    private boolean delete(String query, long id) {
+    // Удаление данных
+    private void delete(String query, long id) {
         int rowsDeleted = jdbc.update(query, id);
-        return rowsDeleted > 0;
     }
 
+    // Проверка существования фильма по ID
     private void existFilmById(Long filmId) {
         Film film = getFilm(filmId).orElseThrow(() -> new NotFoundException("Фильм с ID " +
                 filmId + " не найден."));
     }
 
+    // Сохранение жанров фильма
     private void saveGenres(Film film) {
         if (film.getGenres() == null || film.getGenres().isEmpty()) {
             return;
@@ -303,6 +319,7 @@ public class FilmDbStorage implements FilmStorage {
         jdbc.batchUpdate(sql, batchArgs);
     }
 
+    // Обновление жанров фильма
     private void updateGenres(Film film) {
         String deleteSql = "DELETE FROM film_genre WHERE film_id = ?";
         jdbc.update(deleteSql, film.getId());
@@ -316,6 +333,7 @@ public class FilmDbStorage implements FilmStorage {
         jdbc.batchUpdate(sql, batchArgs);
     }
 
+    // Сохранение режиссеров фильма
     private void saveDirectors(Film film) {
         if (film.getDirectors() == null || film.getDirectors().isEmpty()) {
             return;
@@ -327,6 +345,7 @@ public class FilmDbStorage implements FilmStorage {
         jdbc.batchUpdate(sql, batchArgs);
     }
 
+    // Обновление режиссеров фильма
     private void updateDirectors(Film film) {
         String deleteSql = "DELETE FROM film_director WHERE film_id = ?";
         jdbc.update(deleteSql, film.getId());
@@ -340,6 +359,7 @@ public class FilmDbStorage implements FilmStorage {
         jdbc.batchUpdate(sql, batchArgs);
     }
 
+    // Получение рекомендаций фильмов для пользователя
     @Override
     public Collection<Film> getRecommendations(Long userId) {
         return jdbc.query(RECOMMENDATION_QUERY, mapper, userId, userId, userId);

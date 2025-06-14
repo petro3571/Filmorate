@@ -44,11 +44,13 @@ public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbc;
     private final UserRowMapper mapper;
 
+    // Получение всех пользователей
     @Override
     public List<User> getAll() {
         return jdbc.query(FIND_ALL_QUERY, mapper);
     }
 
+    // Поиск по ID
     @Override
     public Optional<User> getUser(Long userId) {
         try {
@@ -59,6 +61,7 @@ public class UserDbStorage implements UserStorage {
         }
     }
 
+    // Сохранение с генерацией ID
     @Override
     public User saveUser(User user) {
         long id = insert(
@@ -72,6 +75,7 @@ public class UserDbStorage implements UserStorage {
         return user;
     }
 
+    // Обновление данных
     @Override
     public User updateUser(User user) {
         update(
@@ -85,6 +89,7 @@ public class UserDbStorage implements UserStorage {
         return user;
     }
 
+    // Удаление пользователя
     @Override
     public User deleteUser(User user) {
         delete(DELETE_QUERY,
@@ -92,6 +97,7 @@ public class UserDbStorage implements UserStorage {
         return user;
     }
 
+    // Добавление друга + запись в ленту событий
     @Override
     public void addFriend(Long userId, Long friendId) {
         existsUserById(userId);
@@ -104,6 +110,7 @@ public class UserDbStorage implements UserStorage {
         update(feedquery, userId, Instant.now().toEpochMilli(), friendId, 3, 2);
     }
 
+    // Подтверждение дружбы
     @Override
     public void confirmFriend(Long userId, Long friendId) {
         existsUserById(userId);
@@ -115,13 +122,15 @@ public class UserDbStorage implements UserStorage {
         update(feedQuery, userId, Instant.now().toEpochMilli(), friendId, 3, 3);
     }
 
+    // Список друзей
     @Override
     public List<Optional<User>> getUserFriends(Long userId) {
         existsUserById(userId);
         String query = "SELECT friend_id FROM friends WHERE user_id = ?";
-        return jdbc.queryForList(query, Long.class, userId).stream().map(friendId -> getUser(friendId)).collect(Collectors.toList());
+        return jdbc.queryForList(query, Long.class, userId).stream().map(this::getUser).collect(Collectors.toList());
     }
 
+    // Удаление из друзей
     @Override
     public void deleteFriend(Long userId, Long friendId) {
         existsUserById(userId);
@@ -135,6 +144,7 @@ public class UserDbStorage implements UserStorage {
 
     }
 
+    // Общие друзья
     @Override
     public List<Optional<User>> getSameFriends(Long userId, Long otherId) {
         existsUserById(userId);
@@ -162,6 +172,7 @@ public class UserDbStorage implements UserStorage {
         }
     }
 
+    // Поиск по email
     @Override
     public Optional<User> findByEmail(String email) {
         try {
@@ -197,8 +208,7 @@ public class UserDbStorage implements UserStorage {
         }
     }
 
-    private boolean delete(String query, long id) {
+    private void delete(String query, long id) {
         int rowsDeleted = jdbc.update(query, id);
-        return rowsDeleted > 0;
     }
 }

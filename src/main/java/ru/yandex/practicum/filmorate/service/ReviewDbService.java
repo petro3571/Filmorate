@@ -63,18 +63,6 @@ public class ReviewDbService {
     public ReviewDto updateReview(UpdateReviewDto reviewDto) {
         Review oldReview = reviewDbStorage.getReview(reviewDto.getReviewId())
                 .orElseThrow(() -> new NotFoundException("Отзыв с id: " + reviewDto.getReviewId() + "не найден"));
-//        if (reviewDto.getUserId() != null && !oldReview.getUserId().equals(reviewDto.getUserId())) {
-//            if (!userDbStorage.exists(reviewDto.getUserId())) {
-//                throw new NotFoundException("Неверно задан id пользователя");
-//            }
-//            oldReview.setUserId(reviewDto.getUserId());
-//        }
-//        if (reviewDto.getFilmId() != null && !oldReview.getFilmId().equals(reviewDto.getFilmId())) {
-//            if (!filmDbStorage.exists(reviewDto.getFilmId())) {
-//                throw new NotFoundException("Неверно задан id фильма");
-//            }
-//            oldReview.setFilmId(reviewDto.getFilmId());
-//        }
         if (reviewDto.getIsPositive() != null && reviewDto.getIsPositive() != oldReview.isPositive()) {
             oldReview.setPositive(reviewDto.getIsPositive());
         }

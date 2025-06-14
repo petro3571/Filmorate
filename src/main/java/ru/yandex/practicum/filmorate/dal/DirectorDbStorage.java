@@ -16,6 +16,7 @@ import java.util.*;
 public class DirectorDbStorage implements DirectorStorage {
     private final JdbcTemplate jdbc;
 
+    // Получение всех режиссеров из БД
     @Override
     public List<Director> getAll() {
         String sql = "SELECT id, name FROM directors";
@@ -27,6 +28,7 @@ public class DirectorDbStorage implements DirectorStorage {
         });
     }
 
+    // Получение режиссера по ID (возвращает Optional)
     @Override
     public Optional<Director> getDirector(Long id) {
         String sql = "SELECT id, name FROM directors WHERE id = ?";
@@ -43,6 +45,7 @@ public class DirectorDbStorage implements DirectorStorage {
         }
     }
 
+    // Создание нового режиссера с генерацией ID
     @Override
     public Director create(Director director) {
         String sql = "INSERT INTO directors (name) VALUES (?)";
@@ -57,6 +60,7 @@ public class DirectorDbStorage implements DirectorStorage {
         return director;
     }
 
+    // Обновление данных режиссера
     @Override
     public Director update(Director director) {
         String sql = "UPDATE directors SET name = ? WHERE id = ?";
@@ -64,12 +68,14 @@ public class DirectorDbStorage implements DirectorStorage {
         return director;
     }
 
+    // Удаление режиссера по ID
     @Override
     public void delete(Long id) {
         String sql = "DELETE FROM directors WHERE id = ?";
         jdbc.update(sql, id);
     }
 
+    // Получение режиссеров для конкретного фильма
     @Override
     public Set<Director> getFilmDirectors(Long filmId) {
         String sql = "SELECT d.id AS id, d.name as name FROM film_director fd " +
@@ -83,6 +89,7 @@ public class DirectorDbStorage implements DirectorStorage {
         }, filmId));
     }
 
+    // Получение режиссеров для списка фильмов (оптимизированный запрос)
     @Override
     public Map<Long, Set<Director>> getDirectorsForFilms(List<Long> filmIds) {
         if (filmIds.isEmpty()) {

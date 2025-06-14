@@ -21,6 +21,7 @@ public class FeedDbStorage implements FeedStorage {
     private final JdbcTemplate jdbc;
     private final FeedRowMapper feedRowMapper;
 
+    // Получение ленты событий для конкретного пользователя
     @Override
     public Collection<Feed> getFeedUser(Long userId) {
         return jdbc.query(QUERY, feedRowMapper, userId);
