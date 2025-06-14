@@ -22,6 +22,7 @@ import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.dal.FilmDbStorage;
 import ru.yandex.practicum.filmorate.dal.UserDbStorage;
+import ru.yandex.practicum.filmorate.service.DirectorService;
 import ru.yandex.practicum.filmorate.service.FilmDbService;
 
 import java.time.LocalDate;
@@ -32,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @JdbcTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-@Import({UserDbStorage.class, FilmDbStorage.class, GenreDbStorage.class, DirectorDbStorage.class, MpaDbStorage.class, UserRowMapper.class, FilmRowMapper.class, GenreRowMapper.class, MpaRowMapper.class,FilmDbService.class})
+@Import({UserDbStorage.class, FilmDbStorage.class, GenreDbStorage.class, DirectorDbStorage.class, MpaDbStorage.class, UserRowMapper.class, FilmRowMapper.class, GenreRowMapper.class, MpaRowMapper.class, FilmDbService.class, DirectorService.class})
 class FilmorateDbApplicationTests {
     private final UserDbStorage userDbStorage;
     private final FilmDbStorage filmDbStorage;
@@ -191,7 +192,14 @@ class FilmorateDbApplicationTests {
                 new FilmDto[] {film2, film6, film10});
         assertArrayEquals(filmDbService.getPopularFilms(10, 1, 2023).toArray(),
                 new FilmDto[] {film11,film1, film3});
-        assertThrows(NotFoundException.class, () -> filmDbService.getPopularFilms(10, 10, 2022));
+
+    }
+
+    @Test
+    @Sql(scripts = "/testdata.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(scripts = "/cleanup.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    void shouldGetGenres() {
+        System.out.println(filmDbService.getAll());
     }
 
     @Test

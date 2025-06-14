@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.annotation.RealeaseDateMin;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Film.
@@ -32,7 +33,7 @@ public class Film {
 
     private Mpa mpa;
 
-    private Set<Genre> genres = new HashSet<>();
+    private Set<Genre> genres = new TreeSet<>();
 
     private Set<Director> directors = new HashSet<>();
 }

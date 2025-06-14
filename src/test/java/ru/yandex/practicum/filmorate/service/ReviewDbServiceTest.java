@@ -139,4 +139,25 @@ class ReviewDbServiceTest {
         //если пользователь уже ставил лайк или дизайк этому фильму:
         assertThrows(IllegalStateException.class, () -> service.addDislike(1L, 5L));
     }
+
+    @Test
+    void shouldUpdateReview() {
+        ReviewDto dto = service.getReview(1L);
+        UpdateReviewDto updateDto = new UpdateReviewDto();
+        updateDto.setReviewId(dto.getReviewId());
+        updateDto.setUserId(2L); // вместо 1
+        updateDto.setFilmId(10L); // вместо 1
+        updateDto.setContent("updated content");
+        updateDto.setIsPositive(false);
+        service.updateReview(updateDto);
+        ReviewDto updatedReview = service.getReview(1L);
+        assertNotEquals(updatedReview, dto);
+        assertEquals(updatedReview.getFilmId(), updateDto.getFilmId());
+        assertEquals(updatedReview.getContent(), updateDto.getContent());
+        assertEquals(updatedReview.getUserId(), updateDto.getUserId());
+        assertEquals(updatedReview.getUseful(), dto.getUseful());
+        updateDto.setUserId(12L);
+        assertThrows(NotFoundException.class, () -> service.updateReview(updateDto));
+    }
+
 }

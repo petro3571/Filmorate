@@ -37,11 +37,11 @@ public class FilmDbService {
 
         List<Long> listFilmIds = films.stream().map(Film::getId).collect(Collectors.toList());
 
-        Map<Long, Set<Genre>> genresForFilms = genreDbStorage.getGenresForFilms(listFilmIds);
+        Map<Long, TreeSet<Genre>> genresForFilms = genreDbStorage.getGenresForFilms(listFilmIds);
         Map<Long, Set<Director>> directorsForFilms = directorStorage.getDirectorsForFilms(listFilmIds);
 
         films.forEach(film -> {
-            film.setGenres(genresForFilms.getOrDefault(film.getId(), new HashSet<>()));
+            film.setGenres(genresForFilms.getOrDefault(film.getId(), new TreeSet<>()));
             film.setDirectors(directorsForFilms.getOrDefault(film.getId(), new HashSet<>()));
         });
 
@@ -158,20 +158,20 @@ public class FilmDbService {
         }
 
         if (popularFilms.isEmpty()) {
-            throw new NotFoundException("Фильмы не найдены.");
+            return Collections.emptyList();
         }
 
         List<Long> listFilmIds = popularFilms.stream().map(Film::getId).collect(Collectors.toList());
 
-        Map<Long, Set<Genre>> genresForFilms = genreDbStorage.getGenresForFilms(listFilmIds);
+        Map<Long, TreeSet<Genre>> genresForFilms = genreDbStorage.getGenresForFilms(listFilmIds);
         Map<Long, Set<Director>> directorsForFilms = directorStorage.getDirectorsForFilms(listFilmIds);
 
         popularFilms.forEach(film -> {
-            film.setGenres(genresForFilms.getOrDefault(film.getId(), new HashSet<>()));
+            film.setGenres(genresForFilms.getOrDefault(film.getId(), new TreeSet<>()));
             film.setDirectors(directorsForFilms.getOrDefault(film.getId(), new HashSet<>()));
         });
 
-        popularFilms.forEach(film -> film.setGenres(genresForFilms.getOrDefault(film.getId(), new HashSet<>())));
+        popularFilms.forEach(film -> film.setGenres(genresForFilms.getOrDefault(film.getId(), new TreeSet<>())));
 
         return popularFilms.stream().map(FilmMapper::mapToFilmDto).collect(Collectors.toList());
     }
@@ -181,11 +181,11 @@ public class FilmDbService {
 
         if (!films.isEmpty()) {
             List<Long> listFilmIds = films.stream().map(Film::getId).collect(Collectors.toList());
-            Map<Long, Set<Genre>> genresForFilms = genreDbStorage.getGenresForFilms(listFilmIds);
+            Map<Long, TreeSet<Genre>> genresForFilms = genreDbStorage.getGenresForFilms(listFilmIds);
             Map<Long, Set<Director>> directorsForFilms = directorStorage.getDirectorsForFilms(listFilmIds);
 
             films.forEach(film -> {
-                film.setGenres(genresForFilms.getOrDefault(film.getId(), new HashSet<>()));
+                film.setGenres(genresForFilms.getOrDefault(film.getId(), new TreeSet<>()));
                 film.setDirectors(directorsForFilms.getOrDefault(film.getId(), new HashSet<>()));
             });
         }
@@ -200,10 +200,10 @@ public class FilmDbService {
 
         if (!films.isEmpty()) {
             List<Long> listFilmIds = films.stream().map(Film::getId).collect(Collectors.toList());
-            Map<Long, Set<Genre>> genresForFilms = genreDbStorage.getGenresForFilms(listFilmIds);
+            Map<Long, TreeSet<Genre>> genresForFilms = genreDbStorage.getGenresForFilms(listFilmIds);
             Map<Long, Set<Director>> directorsForFilms = directorStorage.getDirectorsForFilms(listFilmIds);
             films.forEach(film -> {
-                film.setGenres(genresForFilms.getOrDefault(film.getId(), new HashSet<>()));
+                film.setGenres(genresForFilms.getOrDefault(film.getId(), new TreeSet<>()));
                 film.setDirectors(directorsForFilms.getOrDefault(film.getId(), new HashSet<>()));
             });
         }
@@ -216,8 +216,8 @@ public class FilmDbService {
             return new ArrayList<>();
         }
         List<Long> listFilmIds = commonFilms.stream().map(Film::getId).toList();
-        Map<Long, Set<Genre>> genres = genreDbStorage.getGenresForFilms(listFilmIds);
-        commonFilms.forEach(film -> film.setGenres(genres.getOrDefault(film.getId(), new HashSet<>())));
+        Map<Long, TreeSet<Genre>> genres = genreDbStorage.getGenresForFilms(listFilmIds);
+        commonFilms.forEach(film -> film.setGenres(genres.getOrDefault(film.getId(), new TreeSet<>())));
         return commonFilms;
     }
 }

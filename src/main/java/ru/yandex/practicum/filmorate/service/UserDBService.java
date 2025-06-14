@@ -127,9 +127,9 @@ public class UserDBService {
 
         List<Long> listFilmIds = recFilms.stream().map(Film::getId).collect(Collectors.toList());
 
-        Map<Long, Set<Genre>> genresForFilms = genreDbStorage.getGenresForFilms(listFilmIds);
+        Map<Long, TreeSet<Genre>> genresForFilms = genreDbStorage.getGenresForFilms(listFilmIds);
 
-        recFilms.forEach(film -> film.setGenres(genresForFilms.getOrDefault(film.getId(), new HashSet<>())));
+        recFilms.forEach(film -> film.setGenres(genresForFilms.getOrDefault(film.getId(), new TreeSet<>())));
 
         return recFilms;
     }

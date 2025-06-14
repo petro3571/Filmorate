@@ -60,11 +60,6 @@ CREATE TABLE IF NOT EXISTS review_dislikes (
 CREATE INDEX IF NOT EXISTS idx_review_likes_review_id ON review_likes(review_id);
 CREATE INDEX IF NOT EXISTS idx_review_dislikes_review_id ON review_dislikes(review_id);
 
-CREATE TABLE IF NOT EXISTS genre (
-            id INT PRIMARY KEY,
-            name VARCHAR(40) NOT NULL
-            );
-
 
     CREATE TABLE IF NOT EXISTS film_genre (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
