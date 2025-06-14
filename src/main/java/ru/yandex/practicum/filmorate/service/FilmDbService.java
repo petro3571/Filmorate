@@ -209,4 +209,15 @@ public class FilmDbService {
         }
         return films;
     }
+
+    public Collection<Film> getCommonFilms(Long userId, Long friendId) {
+        Collection<Film> commonFilms = filmDbStorage.getCommonFilms(userId, friendId);
+        if (commonFilms.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<Long> listFilmIds = commonFilms.stream().map(Film::getId).toList();
+        Map<Long, Set<Genre>> genres = genreDbStorage.getGenresForFilms(listFilmIds);
+        commonFilms.forEach(film -> film.setGenres(genres.getOrDefault(film.getId(), new HashSet<>())));
+        return commonFilms;
+    }
 }

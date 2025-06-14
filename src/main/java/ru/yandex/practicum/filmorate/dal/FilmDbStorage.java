@@ -21,6 +21,9 @@ import java.util.Optional;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Repository
@@ -110,6 +113,13 @@ public class FilmDbStorage implements FilmStorage {
             "LEFT JOIN film_genre fg on f.film_id = fg.film_id " +
             "WHERE fg.genre_id = ? AND EXTRACT(YEAR from CAST(release_date AS date)) = ?" +
             "GROUP BY f.film_id ORDER BY likes_count DESC, f.film_id LIMIT ?";
+
+    private static final String COMMON_FILMS = "SELECT f.*, m.name AS mpa_name, count(l.user_id) AS likes_count FROM films f " +
+            "LEFT JOIN likes l on f.film_id = l.film_id JOIN mpa m ON f.mpa_id = m.id " +
+            "WHERE EXISTS (SELECT 1 FROM likes ul WHERE f.film_id = ul.film_id AND ul.user_id = ?) " +
+            "AND EXISTS (SELECT 1 FROM likes ul1 WHERE f.film_id = ul1.film_id AND ul1.user_id = ?) " +
+            "GROUP BY f.film_id " +
+            "ORDER BY likes_count DESC, f.film_id";
 
     private final JdbcTemplate jdbc;
     private final FilmRowMapper mapper;
@@ -259,6 +269,11 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Collection<Film> getPopularFilmsByGenreAndYear(Integer count, Integer genre, Integer year) {
         return jdbc.query(POPULAR_QUERY_BY_GENRE_AND_YEAR, mapper, genre, year, count);
+    }
+
+    @Override
+    public Collection<Film> getCommonFilms(Long userId, Long friendId) {
+        return jdbc.query(COMMON_FILMS, mapper, userId, friendId);
     }
 
     private long insert(String query, Object... params) {
