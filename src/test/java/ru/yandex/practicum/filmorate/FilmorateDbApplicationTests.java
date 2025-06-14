@@ -6,22 +6,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
-import ru.yandex.practicum.filmorate.dal.*;
 import org.springframework.test.context.jdbc.Sql;
-import ru.yandex.practicum.filmorate.dal.GenreDbStorage;
-import ru.yandex.practicum.filmorate.dal.MpaDbStorage;
+import ru.yandex.practicum.filmorate.dal.*;
 import ru.yandex.practicum.filmorate.dal.mapper.FilmRowMapper;
 import ru.yandex.practicum.filmorate.dal.mapper.GenreRowMapper;
 import ru.yandex.practicum.filmorate.dal.mapper.MpaRowMapper;
 import ru.yandex.practicum.filmorate.dal.mapper.UserRowMapper;
-import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.dal.FilmDbStorage;
-import ru.yandex.practicum.filmorate.dal.UserDbStorage;
 import ru.yandex.practicum.filmorate.service.DirectorService;
 import ru.yandex.practicum.filmorate.service.FilmDbService;
 
@@ -185,13 +180,13 @@ class FilmorateDbApplicationTests {
         FilmDto film10 = filmDbService.getFilm(10L);
         FilmDto film11 = filmDbService.getFilm(11L);
         assertArrayEquals(filmDbService.getPopularFilms(10, null, null).toArray(),
-                new FilmDto[] {film11, film1, film2, film3, film4, film5, film6, film7, film9, film8});
+                new FilmDto[]{film11, film1, film2, film3, film4, film5, film6, film7, film9, film8});
         assertArrayEquals(filmDbService.getPopularFilms(10, 1, null).toArray(),
-                new FilmDto[] {film11, film1, film3, film6, film8});
+                new FilmDto[]{film11, film1, film3, film6, film8});
         assertArrayEquals(filmDbService.getPopularFilms(10, null, 2022).toArray(),
-                new FilmDto[] {film2, film6, film10});
+                new FilmDto[]{film2, film6, film10});
         assertArrayEquals(filmDbService.getPopularFilms(10, 1, 2023).toArray(),
-                new FilmDto[] {film11,film1, film3});
+                new FilmDto[]{film11, film1, film3});
 
     }
 
