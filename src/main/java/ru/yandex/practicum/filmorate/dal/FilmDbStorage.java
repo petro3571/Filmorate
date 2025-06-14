@@ -14,7 +14,10 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
-import java.util.*;
+import java.time.Instant;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Repository
@@ -76,6 +79,8 @@ public class FilmDbStorage implements FilmStorage {
             "GROUP BY f.film_id, m.name " +
             "ORDER BY COUNT(l.user_id) DESC";
 
+    private static final String EXISTS_QUERY = "SELECT 1 FROM films f WHERE f.film_id = ?";
+
     private final JdbcTemplate jdbc;
     private final FilmRowMapper mapper;
 
@@ -135,17 +140,37 @@ public class FilmDbStorage implements FilmStorage {
     public void addLike(Long filmId, Long userId) {
         existFilmById(filmId);
         jdbc.update(LIKE_QUERY, filmId, userId);
+
+        String feedquery = "INSERT INTO feeds (user_id, timestamp, entity_id, event_type_id, event_operation_id) VALUES (?,?,?,?,?)";
+        update(feedquery, userId, Instant.now().toEpochMilli(), filmId, 1, 2);
     }
 
     @Override
     public void deleteLike(Long filmId, Long userId) {
         existFilmById(filmId);
+
+        String feedQuery = "INSERT INTO feeds (user_id, timestamp, entity_id, event_type_id, event_operation_id) VALUES (?,?,?,?,?)";
+        update(feedQuery, userId, Instant.now().toEpochMilli(), filmId, 1, 1);
+
         jdbc.update(DELETE_LIKE_QUERY, filmId, userId);
     }
 
     @Override
     public Collection<Film> getPopularFilms(Integer count) {
         return jdbc.query(POPULAR_QUERY, mapper, count);
+    }
+
+    public boolean exists(Long filmId) {
+        try {
+            Integer result = jdbc.queryForObject(
+                    EXISTS_QUERY,
+                    Integer.class,
+                    filmId
+            );
+            return result != 0;
+        } catch (EmptyResultDataAccessException e) {
+            return false;
+        }
     }
 
     @Override
