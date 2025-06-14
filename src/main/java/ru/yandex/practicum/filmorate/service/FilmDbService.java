@@ -145,8 +145,17 @@ public class FilmDbService {
         log.info("Пользователь с id " + userId + " удалил лайк фильму с id " + filmId + " .");
     }
 
-    public Collection<Film> getPopularFilms(Integer count) {
-        Collection<Film> popularFilms = filmDbStorage.getPopularFilms(count);
+    public Collection<FilmDto> getPopularFilms(Integer count, Integer genreId, Integer year) {
+        Collection<Film> popularFilms;
+        if (genreId != null && year != null) {
+            popularFilms = filmDbStorage.getPopularFilmsByGenreAndYear(count, genreId, year);
+        } else if (genreId != null) {
+            popularFilms = filmDbStorage.getPopularFilmsByGenre(count, genreId);
+        } else if (year != null) {
+            popularFilms = filmDbStorage.getPopularFilmsByYear(count, year);
+        } else {
+            popularFilms = filmDbStorage.getPopularFilms(count);
+        }
 
         if (popularFilms.isEmpty()) {
             throw new NotFoundException("Фильмы не найдены.");
@@ -162,7 +171,9 @@ public class FilmDbService {
             film.setDirectors(directorsForFilms.getOrDefault(film.getId(), new HashSet<>()));
         });
 
-        return popularFilms;
+        popularFilms.forEach(film -> film.setGenres(genresForFilms.getOrDefault(film.getId(), new HashSet<>())));
+
+        return popularFilms.stream().map(FilmMapper::mapToFilmDto).collect(Collectors.toList());
     }
 
     public Collection<Film> searchFilms(String query, List<String> by) {
@@ -191,13 +202,11 @@ public class FilmDbService {
             List<Long> listFilmIds = films.stream().map(Film::getId).collect(Collectors.toList());
             Map<Long, Set<Genre>> genresForFilms = genreDbStorage.getGenresForFilms(listFilmIds);
             Map<Long, Set<Director>> directorsForFilms = directorStorage.getDirectorsForFilms(listFilmIds);
-
             films.forEach(film -> {
                 film.setGenres(genresForFilms.getOrDefault(film.getId(), new HashSet<>()));
                 film.setDirectors(directorsForFilms.getOrDefault(film.getId(), new HashSet<>()));
             });
         }
-
         return films;
     }
 }

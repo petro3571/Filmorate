@@ -29,4 +29,10 @@ public interface FilmStorage {
     Collection<Film> getFilmsByDirector(Long directorId, String sortBy);
 
     Collection<Film> getRecommendations(Long userId);
+
+    Collection<Film> getPopularFilmsByYear(Integer count, Integer year);
+
+    Collection<Film> getPopularFilmsByGenre(Integer count, Integer genre);
+
+    Collection<Film> getPopularFilmsByGenreAndYear(Integer count, Integer genre, Integer year);
 }
