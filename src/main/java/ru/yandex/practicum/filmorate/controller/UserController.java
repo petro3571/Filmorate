@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.dto.FeedDto;
 import ru.yandex.practicum.filmorate.dto.NewUserRequest;
 import ru.yandex.practicum.filmorate.dto.UpdateUserRequest;
 import ru.yandex.practicum.filmorate.dto.UserDto;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserDBService;
 
@@ -77,5 +78,10 @@ public class UserController {
     @GetMapping("/{userId}/feed")
     public Collection<FeedDto> getFeedUser(@PathVariable("userId") Long userId) {
         return userService.getFeedUser(userId);
+    }
+
+    @GetMapping("/{userId}/recommendations")
+    public Collection<Film> getRecommendations(@PathVariable("userId") Long userId) {
+        return userService.getRecommendations(userId);
     }
 }

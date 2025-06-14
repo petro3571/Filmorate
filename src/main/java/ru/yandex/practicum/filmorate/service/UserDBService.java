@@ -12,13 +12,18 @@ import ru.yandex.practicum.filmorate.exception.IdValidationException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.mapper.FeedMapper;
 import ru.yandex.practicum.filmorate.mapper.UserMapper;
+import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.FeedStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -27,6 +32,8 @@ import java.util.stream.Collectors;
 public class UserDBService {
     private final UserStorage userDbStorage;
     private final FeedStorage feedDbStorage;
+    private final FilmStorage filmDbStorage;
+    private final GenreStorage genreDbStorage;
 
     public List<UserDto> getUsers() {
         return userDbStorage.getAll()
@@ -108,5 +115,22 @@ public class UserDBService {
 
     public Collection<FeedDto> getFeedUser(Long userId) {
         return feedDbStorage.getFeedUser(userId).stream().map(FeedMapper::mapToFeedDto).collect(Collectors.toList());
+    }
+
+    public Collection<Film> getRecommendations(Long userId) {
+        userDbStorage.existsUserById(userId);
+        Collection<Film> recFilms = filmDbStorage.getRecommendations(userId);
+
+        if (recFilms.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<Long> listFilmIds = recFilms.stream().map(Film::getId).collect(Collectors.toList());
+
+        Map<Long, Set<Genre>> genresForFilms = genreDbStorage.getGenresForFilms(listFilmIds);
+
+        recFilms.forEach(film -> film.setGenres(genresForFilms.getOrDefault(film.getId(), new HashSet<>())));
+
+        return recFilms;
     }
 }

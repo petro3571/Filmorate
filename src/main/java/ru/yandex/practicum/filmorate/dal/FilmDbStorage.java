@@ -81,6 +81,11 @@ public class FilmDbStorage implements FilmStorage {
 
     private static final String EXISTS_QUERY = "SELECT 1 FROM films f WHERE f.film_id = ?";
 
+    private static final String RECOMMENDATION_QUERY = "SELECT f.*, m.name AS mpa_name FROM films f JOIN mpa m ON " +
+            "f.mpa_id = m.id WHERE f.film_id in (SELECT film_id FROM likes WHERE user_id in (SELECT user_id FROM likes" +
+            " WHERE film_id in (SELECT film_id FROM likes WHERE user_id = ?) and user_id not in (?) GROUP BY user_id " +
+            "limit 1)) and f.film_id not in (SELECT film_id FROM likes WHERE user_id = ?)";
+
     private final JdbcTemplate jdbc;
     private final FilmRowMapper mapper;
 
@@ -297,5 +302,10 @@ public class FilmDbStorage implements FilmStorage {
                 .map(director -> new Object[]{film.getId(), director.getId()})
                 .collect(Collectors.toList());
         jdbc.batchUpdate(sql, batchArgs);
+    }
+
+    @Override
+    public Collection<Film> getRecommendations(Long userId) {
+        return jdbc.query(RECOMMENDATION_QUERY, mapper, userId, userId, userId);
     }
 }
