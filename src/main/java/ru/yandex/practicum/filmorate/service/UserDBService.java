@@ -15,14 +15,11 @@ import ru.yandex.practicum.filmorate.mapper.UserMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.FeedStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.GenreStorage;
-import ru.yandex.practicum.filmorate.storage.FeedStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -114,6 +111,10 @@ public class UserDBService {
     }
 
     public Collection<FeedDto> getFeedUser(Long userId) {
+        boolean existsUser = userDbStorage.exists(userId);
+        if (!existsUser) {
+            throw new NotFoundException("Пользователя с таким id не существует");
+        }
         return feedDbStorage.getFeedUser(userId).stream().map(FeedMapper::mapToFeedDto).collect(Collectors.toList());
     }
 

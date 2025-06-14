@@ -8,9 +8,9 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import ru.yandex.practicum.filmorate.exception.DataAlreadyExistException;
+import ru.yandex.practicum.filmorate.exception.DateFilmValidationException;
 import ru.yandex.practicum.filmorate.exception.IdValidationException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.DateFilmValidationException;
 
 import java.util.HashMap;
 import java.util.Map;

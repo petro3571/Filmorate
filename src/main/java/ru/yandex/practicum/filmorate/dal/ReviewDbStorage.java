@@ -20,28 +20,19 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ReviewDbStorage {
 
-    private final JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    private final ReviewRowMapper reviewRowMapper;
-
     private static final String INSERT_QUERY = "INSERT INTO reviews (user_id, film_id, positive, content)" +
             " VALUES (?, ?, ?, ?)";
-
     private static final String DELETE_QUERY = "DELETE FROM reviews r WHERE r.id = ?";
-
     private static final String SELECT_QUERY = "SELECT r.*, (SELECT COUNT(*) FROM review_likes WHERE review_id = r.id) - " +
             " (SELECT COUNT(*) FROM review_dislikes WHERE review_id = r.id) AS useful " +
             "FROM reviews r " +
             "WHERE r.id = ? ";
-
     private static final String SELECT_ALL_QUERY = "SELECT r.*, (SELECT COUNT(*) FROM review_likes WHERE review_id = r.id) - " +
             " (SELECT COUNT(*) FROM review_dislikes WHERE review_id = r.id) AS useful " +
             "FROM reviews r " +
             "GROUP BY r.id " +
             "ORDER BY useful DESC " +
             "LIMIT ?";
-
     private static final String SELECT_ALL_BY_FILM_ID_QUERY = "SELECT r.*, (SELECT COUNT(*) FROM review_likes WHERE review_id = r.id) - " +
             " (SELECT COUNT(*) FROM review_dislikes WHERE review_id = r.id) AS useful " +
             "FROM reviews r " +
@@ -49,19 +40,20 @@ public class ReviewDbStorage {
             "GROUP BY r.id " +
             "ORDER BY useful DESC " +
             "LIMIT ?";
-
     private static final String UPDATE_QUERY = "UPDATE reviews r SET user_id = ?, film_id = ?, positive = ?, " +
             " content = ? WHERE r.id = ?";
-
     private static final String ADD_LIKE_QUERY = "INSERT INTO review_likes (review_id, user_id) VALUES (?, ?)";
     private static final String ADD_DISLIKE_QUERY = "INSERT INTO review_dislikes (review_id, user_id) VALUES (?, ?)";
     private static final String DELETE_LIKE_QUERY = "DELETE FROM review_likes r WHERE r.review_id = ? AND r.user_id = ?";
     private static final String DELETE_DISLIKE_QUERY = "DELETE FROM review_dislikes r WHERE r.review_id = ? AND r.user_id = ?";
-
     private static final String EXISTS_LIKE_QUERY = "SELECT 1 FROM review_likes r WHERE r.user_id = ? AND r.review_id = ?";
     private static final String EXISTS_DISLIKE_QUERY = "SELECT 1 FROM review_dislikes r WHERE r.user_id = ? AND r.review_id = ?";
+    private final JdbcTemplate jdbcTemplate;
+    @Autowired
+    private final ReviewRowMapper reviewRowMapper;
 
     public Review createReview(Review review) {
+
         long id = insert(INSERT_QUERY,
                 review.getUserId(),
                 review.getFilmId(),

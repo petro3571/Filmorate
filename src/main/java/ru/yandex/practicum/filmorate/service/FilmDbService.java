@@ -32,7 +32,7 @@ public class FilmDbService {
         Collection<Film> films = filmDbStorage.getAll();
 
         if (films.isEmpty()) {
-             return new ArrayList<>();
+            return new ArrayList<>();
         }
 
         List<Long> listFilmIds = films.stream().map(Film::getId).collect(Collectors.toList());
