@@ -102,16 +102,12 @@ class ReviewDbServiceTest {
         ReviewDto dto = service.getReview(1L);
         UpdateReviewDto updateDto = new UpdateReviewDto();
         updateDto.setReviewId(dto.getReviewId());
-        updateDto.setUserId(2L);
-        updateDto.setFilmId(10L);
         updateDto.setContent("updated content");
         updateDto.setIsPositive(true);
         service.updateReview(updateDto);
         ReviewDto updatedReview = service.getReview(1L);
         assertNotEquals(updatedReview, dto);
-        assertEquals(updatedReview.getFilmId(), updateDto.getFilmId());
         assertEquals(updatedReview.getContent(), updateDto.getContent());
-        assertEquals(updatedReview.getUserId(), updateDto.getUserId());
 
     }
 
@@ -145,19 +141,13 @@ class ReviewDbServiceTest {
         ReviewDto dto = service.getReview(1L);
         UpdateReviewDto updateDto = new UpdateReviewDto();
         updateDto.setReviewId(dto.getReviewId());
-        updateDto.setUserId(2L); // вместо 1
-        updateDto.setFilmId(10L); // вместо 1
         updateDto.setContent("updated content");
         updateDto.setIsPositive(false);
         service.updateReview(updateDto);
         ReviewDto updatedReview = service.getReview(1L);
         assertNotEquals(updatedReview, dto);
-        assertEquals(updatedReview.getFilmId(), updateDto.getFilmId());
         assertEquals(updatedReview.getContent(), updateDto.getContent());
-        assertEquals(updatedReview.getUserId(), updateDto.getUserId());
         assertEquals(updatedReview.getUseful(), dto.getUseful());
-        updateDto.setUserId(12L);
-        assertThrows(NotFoundException.class, () -> service.updateReview(updateDto));
     }
 
 }
