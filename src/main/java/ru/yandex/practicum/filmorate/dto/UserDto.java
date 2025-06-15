@@ -12,6 +12,5 @@ public class UserDto {
     private String name;
     private String email;
     private String login;
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private LocalDate birthday;
 }

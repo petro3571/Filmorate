@@ -1,12 +1,17 @@
 package ru.yandex.practicum.filmorate.model;
 
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
-import jakarta.validation.constraints.*;
 import ru.yandex.practicum.filmorate.annotation.RealeaseDateMin;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Film.
@@ -31,5 +36,7 @@ public class Film {
 
     private Mpa mpa;
 
-    private Set<Genre> genres;
+    private Set<Genre> genres = new TreeSet<>();
+
+    private Set<Director> directors = new HashSet<>();
 }

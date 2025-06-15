@@ -21,11 +21,13 @@ public class MpaDbStorage implements MpaStorage {
     private final JdbcTemplate jdbc;
     private final MpaRowMapper mapper;
 
+    // Получает все рейтинги из таблицы mpa
     @Override
     public List<Mpa> getAll() {
         return jdbc.query(FIND_ALL_QUERY, mapper);
     }
 
+    // Получает рейтинг по его ID
     @Override
     public Optional<Mpa> getMpa(Integer mpaId) {
         try {
