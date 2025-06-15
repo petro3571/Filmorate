@@ -269,6 +269,12 @@ public class FilmDbStorage implements FilmStorage {
         return jdbc.query(COMMON_FILMS, mapper, userId, friendId);
     }
 
+    // Получение рекомендаций фильмов для пользователя
+    @Override
+    public Collection<Film> getRecommendations(Long userId) {
+        return jdbc.query(RECOMMENDATION_QUERY, mapper, userId, userId, userId);
+    }
+
     // Вставка данных с возвратом сгенерированного ID
     private long insert(String query, Object... params) {
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
@@ -357,11 +363,5 @@ public class FilmDbStorage implements FilmStorage {
                 .map(director -> new Object[]{film.getId(), director.getId()})
                 .collect(Collectors.toList());
         jdbc.batchUpdate(sql, batchArgs);
-    }
-
-    // Получение рекомендаций фильмов для пользователя
-    @Override
-    public Collection<Film> getRecommendations(Long userId) {
-        return jdbc.query(RECOMMENDATION_QUERY, mapper, userId, userId, userId);
     }
 }
