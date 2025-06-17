@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.dal;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.dal.mapper.FeedRowMapper;
@@ -12,7 +11,6 @@ import java.util.Collection;
 
 @Repository
 @RequiredArgsConstructor
-@Qualifier("feedDbStorage")
 public class FeedDbStorage implements FeedStorage {
     private static final String QUERY = "SELECT f.event_id,f.user_id,f.timestamp,f.entity_id, et.name as event_type, " +
             "o.name as event_operation FROM feeds f join event_type as et on f.event_type_id = et.id join operations " +

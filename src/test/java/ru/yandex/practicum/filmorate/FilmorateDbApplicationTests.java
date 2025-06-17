@@ -8,17 +8,14 @@ import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.jdbc.Sql;
 import ru.yandex.practicum.filmorate.dal.*;
-import ru.yandex.practicum.filmorate.dal.mapper.FilmRowMapper;
-import ru.yandex.practicum.filmorate.dal.mapper.GenreRowMapper;
-import ru.yandex.practicum.filmorate.dal.mapper.MpaRowMapper;
-import ru.yandex.practicum.filmorate.dal.mapper.UserRowMapper;
+import ru.yandex.practicum.filmorate.dal.mapper.*;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.DirectorService;
-import ru.yandex.practicum.filmorate.service.FilmDbService;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -28,12 +25,13 @@ import static org.junit.jupiter.api.Assertions.*;
 @JdbcTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-@Import({UserDbStorage.class, FilmDbStorage.class, GenreDbStorage.class, DirectorDbStorage.class, MpaDbStorage.class, UserRowMapper.class, FilmRowMapper.class, GenreRowMapper.class, MpaRowMapper.class, FilmDbService.class, DirectorService.class})
+@Import({UserDbStorage.class, FilmDbStorage.class, GenreDbStorage.class, DirectorDbStorage.class, MpaDbStorage.class,
+        UserRowMapper.class, FilmRowMapper.class, GenreRowMapper.class, MpaRowMapper.class, DirectorRowMapper.class, FilmService.class, DirectorService.class})
 class FilmorateDbApplicationTests {
     private final UserDbStorage userDbStorage;
     private final FilmDbStorage filmDbStorage;
     private final DirectorDbStorage directorDbStorage;
-    private final FilmDbService filmDbService;
+    private final FilmService filmService;
 
     private User testUser;
     private Film testFilm;
@@ -194,24 +192,24 @@ class FilmorateDbApplicationTests {
     @Sql(scripts = "/testdata.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "/cleanup.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void shouldGetCorrectPopularFilms() {
-        FilmDto film1 = filmDbService.getFilm(1L);
-        FilmDto film2 = filmDbService.getFilm(2L);
-        FilmDto film3 = filmDbService.getFilm(3L);
-        FilmDto film4 = filmDbService.getFilm(4L);
-        FilmDto film5 = filmDbService.getFilm(5L);
-        FilmDto film6 = filmDbService.getFilm(6L);
-        FilmDto film7 = filmDbService.getFilm(7L);
-        FilmDto film8 = filmDbService.getFilm(8L);
-        FilmDto film9 = filmDbService.getFilm(9L);
-        FilmDto film10 = filmDbService.getFilm(10L);
-        FilmDto film11 = filmDbService.getFilm(11L);
-        assertArrayEquals(filmDbService.getPopularFilms(10, null, null).toArray(),
+        FilmDto film1 = filmService.getFilm(1L);
+        FilmDto film2 = filmService.getFilm(2L);
+        FilmDto film3 = filmService.getFilm(3L);
+        FilmDto film4 = filmService.getFilm(4L);
+        FilmDto film5 = filmService.getFilm(5L);
+        FilmDto film6 = filmService.getFilm(6L);
+        FilmDto film7 = filmService.getFilm(7L);
+        FilmDto film8 = filmService.getFilm(8L);
+        FilmDto film9 = filmService.getFilm(9L);
+        FilmDto film10 = filmService.getFilm(10L);
+        FilmDto film11 = filmService.getFilm(11L);
+        assertArrayEquals(filmService.getPopularFilms(10, null, null).toArray(),
                 new FilmDto[]{film11, film1, film2, film3, film4, film5, film6, film7, film9, film8});
-        assertArrayEquals(filmDbService.getPopularFilms(10, 1, null).toArray(),
+        assertArrayEquals(filmService.getPopularFilms(10, 1, null).toArray(),
                 new FilmDto[]{film11, film1, film3, film6, film8});
-        assertArrayEquals(filmDbService.getPopularFilms(10, null, 2022).toArray(),
+        assertArrayEquals(filmService.getPopularFilms(10, null, 2022).toArray(),
                 new FilmDto[]{film2, film6, film10});
-        assertArrayEquals(filmDbService.getPopularFilms(10, 1, 2023).toArray(),
+        assertArrayEquals(filmService.getPopularFilms(10, 1, 2023).toArray(),
                 new FilmDto[]{film11, film1, film3});
 
     }
@@ -225,7 +223,7 @@ class FilmorateDbApplicationTests {
     @Sql(scripts = "/testdata.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "/cleanup.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void shouldGetGenres() {
-        System.out.println(filmDbService.getAll());
+        System.out.println(filmService.getAll());
     }
 
     /**

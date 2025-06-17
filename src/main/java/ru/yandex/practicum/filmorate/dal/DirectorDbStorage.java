@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.dal.mapper.DirectorRowMapper;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 
@@ -15,17 +16,13 @@ import java.util.*;
 @RequiredArgsConstructor
 public class DirectorDbStorage implements DirectorStorage {
     private final JdbcTemplate jdbc;
+    private final DirectorRowMapper directorRowMapper;
 
     // Получение всех режиссеров из БД
     @Override
     public List<Director> getAll() {
         String sql = "SELECT id, name FROM directors";
-        return jdbc.query(sql, (rs, rowNum) -> {
-            Director director = new Director();
-            director.setId(rs.getLong("id"));
-            director.setName(rs.getString("name"));
-            return director;
-        });
+        return jdbc.query(sql, directorRowMapper);
     }
 
     // Получение режиссера по ID (возвращает Optional)
@@ -33,12 +30,7 @@ public class DirectorDbStorage implements DirectorStorage {
     public Optional<Director> getDirector(Long id) {
         String sql = "SELECT id, name FROM directors WHERE id = ?";
         try {
-            Director director = jdbc.queryForObject(sql, (rs, rowNum) -> {
-                Director d = new Director();
-                d.setId(rs.getLong("id"));
-                d.setName(rs.getString("name"));
-                return d;
-            }, id);
+            Director director = jdbc.queryForObject(sql, directorRowMapper, id);
             return Optional.ofNullable(director);
         } catch (Exception e) {
             return Optional.empty();
@@ -81,12 +73,7 @@ public class DirectorDbStorage implements DirectorStorage {
         String sql = "SELECT d.id AS id, d.name as name FROM film_director fd " +
                 "JOIN directors d ON fd.director_id = d.id " +
                 "WHERE fd.film_id = ?";
-        return new HashSet<>(jdbc.query(sql, (rs, rowNum) -> {
-            Director director = new Director();
-            director.setId(rs.getLong("id"));
-            director.setName(rs.getString("name"));
-            return director;
-        }, filmId));
+        return new HashSet<>(jdbc.query(sql, directorRowMapper, filmId));
     }
 
     // Получение режиссеров для списка фильмов (оптимизированный запрос)

@@ -12,7 +12,7 @@ import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.dto.NewFilmRequest;
 import ru.yandex.practicum.filmorate.dto.UpdateFilmRequest;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.service.FilmDbService;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 @Validated
 public class FilmController {
 
-    private final FilmDbService filmService;
+    private final FilmService filmService;
 
     @GetMapping
     public Collection<FilmDto> getAll() {

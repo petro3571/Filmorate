@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class ReviewDbService {
+public class ReviewService {
 
     private final ReviewDbStorage reviewDbStorage;
     private final ReviewMapper reviewMapper;

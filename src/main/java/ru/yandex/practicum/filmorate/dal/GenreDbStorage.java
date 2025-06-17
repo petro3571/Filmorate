@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.dal;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -14,7 +13,6 @@ import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
-@Qualifier("genreDbStorage")
 public class GenreDbStorage implements GenreStorage {
     private static final String FIND_ALL_QUERY = "SELECT id, name FROM genre";
     private static final String FIND_BY_ID_QUERY = "SELECT id, name FROM genre WHERE id = ?";

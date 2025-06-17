@@ -13,10 +13,10 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class GenreDbService {
+public class GenreService {
     private final GenreStorage genreDbStorage;
 
-    public GenreDbService(GenreDbStorage genreDbStorage) {
+    public GenreService(GenreDbStorage genreDbStorage) {
         this.genreDbStorage = genreDbStorage;
     }
 

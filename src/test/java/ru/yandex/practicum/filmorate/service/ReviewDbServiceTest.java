@@ -24,13 +24,13 @@ import static org.junit.jupiter.api.Assertions.*;
 @JdbcTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-@Import({ReviewDbService.class, ReviewDto.class, ReviewMapper.class, NewReviewDto.class, UpdateReviewDto.class,
+@Import({ReviewService.class, ReviewDto.class, ReviewMapper.class, NewReviewDto.class, UpdateReviewDto.class,
         ReviewDbStorage.class, ReviewRowMapper.class, UserDbStorage.class, FilmDbStorage.class, UserRowMapper.class, FilmRowMapper.class})
 @Sql(scripts = "/testdata.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @Sql(scripts = "/cleanup.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 class ReviewDbServiceTest {
 
-    private final ReviewDbService service;
+    private final ReviewService service;
 
     @Test
     void getReviews() {

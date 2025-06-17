@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UserDBService {
+public class UserService {
     private final UserStorage userDbStorage;
     private final FeedStorage feedDbStorage;
     private final FilmStorage filmDbStorage;

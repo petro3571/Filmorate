@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.dal;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -23,7 +22,6 @@ import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
-@Qualifier("filmDbStorage")
 public class FilmDbStorage implements FilmStorage {
     private static final String INSERT_QUERY = "INSERT INTO films(title, description, release_date, duration, MPA_id) " +
             "VALUES (?, ?, ?, ?, ?)";
