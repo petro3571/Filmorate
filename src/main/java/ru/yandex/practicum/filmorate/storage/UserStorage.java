@@ -30,4 +30,6 @@ public interface UserStorage {
     void confirmFriend(Long userId, Long otherId);
 
     void existsUserById(Long userId);
+
+    boolean exists(Long userId);
 }

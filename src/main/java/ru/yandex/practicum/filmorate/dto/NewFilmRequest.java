@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import ru.yandex.practicum.filmorate.annotation.RealeaseDateMin;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
@@ -29,4 +30,6 @@ public class NewFilmRequest {
     private Mpa mpa;
 
     private Set<Genre> genres = new HashSet<>();
+
+    private Set<Director> directors = new HashSet<>();
 }

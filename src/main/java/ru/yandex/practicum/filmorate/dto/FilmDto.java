@@ -6,11 +6,14 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import ru.yandex.practicum.filmorate.annotation.RealeaseDateMin;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 @Data
 public class FilmDto {
@@ -32,5 +35,7 @@ public class FilmDto {
 
     private Mpa mpa;
 
-    private Set<Genre> genres;
+    private Set<Genre> genres = new TreeSet<>();
+
+    private Set<Director> directors = new HashSet<>();
 }

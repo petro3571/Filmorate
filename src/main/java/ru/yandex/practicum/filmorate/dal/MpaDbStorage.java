@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.dal;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -14,18 +13,19 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-@Qualifier("mpaDbStorage")
 public class MpaDbStorage implements MpaStorage {
     private static final String FIND_ALL_QUERY = "SELECT id, name FROM mpa";
     private static final String FIND_BY_ID_QUERY = "SELECT id, name FROM mpa WHERE id = ?";
     private final JdbcTemplate jdbc;
     private final MpaRowMapper mapper;
 
+    // Получает все рейтинги из таблицы mpa
     @Override
     public List<Mpa> getAll() {
         return jdbc.query(FIND_ALL_QUERY, mapper);
     }
 
+    // Получает рейтинг по его ID
     @Override
     public Optional<Mpa> getMpa(Integer mpaId) {
         try {

@@ -4,12 +4,15 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.dto.FeedDto;
 import ru.yandex.practicum.filmorate.dto.NewUserRequest;
 import ru.yandex.practicum.filmorate.dto.UpdateUserRequest;
 import ru.yandex.practicum.filmorate.dto.UserDto;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.UserDBService;
+import ru.yandex.practicum.filmorate.service.UserService;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,7 +20,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
-    private final UserDBService userService;
+    private final UserService userService;
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
@@ -37,6 +40,7 @@ public class UserController {
     }
 
     @PutMapping
+    @ResponseStatus(HttpStatus.OK)
     public UserDto updateUser(@Valid @RequestBody UpdateUserRequest userRequest) {
         return userService.updateUser(userRequest);
     }
@@ -69,5 +73,15 @@ public class UserController {
     @PutMapping("/{userId}/friends/{friendId}/confirm")
     public void confirmFriend(@PathVariable("userId") Long userId, @PathVariable("friendId") Long friendId) {
         userService.confirmFriend(userId, friendId);
+    }
+
+    @GetMapping("/{userId}/feed")
+    public Collection<FeedDto> getFeedUser(@PathVariable("userId") Long userId) {
+        return userService.getFeedUser(userId);
+    }
+
+    @GetMapping("/{userId}/recommendations")
+    public Collection<Film> getRecommendations(@PathVariable("userId") Long userId) {
+        return userService.getRecommendations(userId);
     }
 }

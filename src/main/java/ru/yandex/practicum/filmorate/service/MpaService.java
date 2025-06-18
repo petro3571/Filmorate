@@ -13,10 +13,10 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class MpaDbService {
+public class MpaService {
     private final MpaStorage mpaDbStorage;
 
-    public MpaDbService(MpaDbStorage mpaDbStorage) {
+    public MpaService(MpaDbStorage mpaDbStorage) {
         this.mpaDbStorage = mpaDbStorage;
     }
 
